@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("StringFormatter")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Zero-allocation string formatting for .NET")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Michael Popoloski")]
 [assembly: AssemblyProduct("StringFormatter")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright ©  2015 Michael Popoloski")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
