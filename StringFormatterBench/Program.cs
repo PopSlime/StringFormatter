@@ -21,19 +21,19 @@ namespace StringFormatterBench
     }
 
     [Config(typeof(Config))]
-    public unsafe class StringFormatBenchmark {
+    public class StringFormatBenchmark {
         StringBuilder _sb1;
         StringBuffer _sb2;
-        char* _dest;
+        StringByteBuffer _sb3;
         static readonly string formatTest = "Foo {0,13:e12} and bar!! {1,-15:P}bah";
         const double v1 = 13.934939;
         const double v2 = 0;
 
         [Setup]
-        public unsafe void Setup() {
-            _dest = (char*) Marshal.AllocHGlobal(128);
+        public void Setup() {
             _sb1 = new StringBuilder();
             _sb2 = new StringBuffer();
+            _sb3 = new StringByteBuffer();
         }
 
         [Benchmark(Baseline = true)]
@@ -51,12 +51,21 @@ namespace StringFormatterBench
             _sb2.Clear();
             return s;
         }
+
+        [Benchmark]
+        public string StringByteBuffer() {
+            _sb3.AppendFormat(formatTest, v1, v2);
+            var s = _sb3.ToString();
+            _sb3.Clear();
+            return s;
+        }
     }
 
     [Config(typeof(Config))]
     public unsafe class NoAllocationBenchmark {
         StringBuilder _sb1;
         StringBuffer _sb2;
+        StringByteBuffer _sb3;
         public char* DestNative;
         public char[] DestManaged;
         static readonly string formatTest = "Foo {0,13:e12} and bar!! {1,-15:P}bah";
@@ -70,6 +79,7 @@ namespace StringFormatterBench
             DestManaged = new char[128];
             _sb1 = new StringBuilder();
             _sb2 = new StringBuffer();
+            _sb3 = new StringByteBuffer();
         }
 
         [Benchmark(Baseline = true)]
@@ -85,6 +95,56 @@ namespace StringFormatterBench
             _sb2.CopyTo(DestNative, 0, _sb2.Count);
             _sb2.Clear();
         }
+
+        /*[Benchmark]
+        public void NoAllocationByte() {
+            _sb3.AppendFormat(formatTest, v1, v2);
+            _sb3.CopyTo(DestNative, 0, _sb3.Count);
+            _sb3.Clear();
+        }*/
+    }
+
+    [Config(typeof(Config))]
+    public unsafe class BytesFormatBenchmark {
+        StringBuilder _sb1;
+        StringBuffer _sb2;
+        StringByteBuffer _sb3;
+        static readonly string formatTest = "Foo {0,13:e12} and bar!! {1,-15:P}bah";
+        const double v1 = 13.934939;
+        const double v2 = 0;
+        public byte* DestNative;
+        public byte[] DestManaged;
+
+        [Setup]
+        public void Setup() {
+            DestNative = (byte*)Marshal.AllocHGlobal(256);
+            DestManaged = new byte[256];
+            _sb1 = new StringBuilder();
+            _sb2 = new StringBuffer();
+            _sb3 = new StringByteBuffer();
+        }
+
+        [Benchmark(Baseline = true)]
+        public void Baseline() {
+            _sb1.AppendFormat(formatTest, v1, v2);
+            var s = _sb1.ToString();
+            Encoding.Default.GetBytes(s, 0, s.Length, DestManaged, 0);
+            _sb1.Clear();
+        }
+
+        [Benchmark]
+        public void StringBuffer() {
+            _sb2.AppendFormat(formatTest, v1, v2);
+            _sb2.CopyTo(DestNative, 0, _sb2.Count, 256, Encoding.Default);
+            _sb2.Clear();
+        }
+
+        [Benchmark]
+        public void StringByteBuffer() {
+            _sb3.AppendFormat(formatTest, v1, v2);
+            _sb3.CopyTo(DestNative, 0, _sb3.Count, 256, Encoding.Default);
+            _sb3.Clear();
+        }
     }
 
     unsafe class Program {
@@ -92,6 +152,7 @@ namespace StringFormatterBench
             var competition = new BenchmarkSwitcher(new[] {
                 typeof(StringFormatBenchmark),
                 typeof(NoAllocationBenchmark),
+                typeof(BytesFormatBenchmark),
             });
 
             competition.Run(args);

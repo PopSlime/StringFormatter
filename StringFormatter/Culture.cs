@@ -3,7 +3,7 @@
 namespace System.Text.Formatting {
     // caches formatting information from culture data
     // some of the accessors on NumberFormatInfo allocate copies of their data
-    sealed class CachedCulture {
+    public sealed class CachedCulture {
         public readonly CultureInfo Culture;
 
         public readonly NumberFormatData CurrencyData;
@@ -132,7 +132,7 @@ namespace System.Text.Formatting {
 
     // contains format information for a specific kind of format string
     // e.g. (fixed, number, currency)
-    sealed class NumberFormatData {
+    public sealed class NumberFormatData {
         readonly int bufferLength;
         readonly int perDigitLength;
 
