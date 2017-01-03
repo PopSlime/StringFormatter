@@ -13,7 +13,7 @@ namespace System.Text.Formatting {
     // Standard numeric format string reference: https://msdn.microsoft.com/en-us/library/dwhawy9k%28v=vs.110%29.aspx
 
     unsafe static partial class Numeric {
-        public static void FormatSByte (StringBuffer formatter, sbyte value, StringView specifier, CachedCulture culture) {
+        public static void FormatSByte (BaseStringBuffer formatter, sbyte value, StringView specifier, CachedCulture culture) {
             if (value < 0 && !specifier.IsEmpty) {
                 // if we're negative and doing a hex format, mask out the bits for the conversion
                 char c = specifier.Data[0];
@@ -24,7 +24,7 @@ namespace System.Text.Formatting {
             FormatInt32(formatter, value, specifier, culture);
         }
 
-        public static void FormatInt16 (StringBuffer formatter, short value, StringView specifier, CachedCulture culture) {
+        public static void FormatInt16 (BaseStringBuffer formatter, short value, StringView specifier, CachedCulture culture) {
             if (value < 0 && !specifier.IsEmpty) {
                 // if we're negative and doing a hex format, mask out the bits for the conversion
                 char c = specifier.Data[0];
@@ -35,7 +35,7 @@ namespace System.Text.Formatting {
             FormatInt32(formatter, value, specifier, culture);
         }
 
-        public static void FormatInt32 (StringBuffer formatter, int value, StringView specifier, CachedCulture culture) {
+        public static void FormatInt32 (BaseStringBuffer formatter, int value, StringView specifier, CachedCulture culture) {
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -70,7 +70,7 @@ namespace System.Text.Formatting {
             }
         }
 
-        public static void FormatUInt32 (StringBuffer formatter, uint value, StringView specifier, CachedCulture culture) {
+        public static void FormatUInt32 (BaseStringBuffer formatter, uint value, StringView specifier, CachedCulture culture) {
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -105,7 +105,7 @@ namespace System.Text.Formatting {
             }
         }
 
-        public static void FormatInt64 (StringBuffer formatter, long value, StringView specifier, CachedCulture culture) {
+        public static void FormatInt64 (BaseStringBuffer formatter, long value, StringView specifier, CachedCulture culture) {
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -140,7 +140,7 @@ namespace System.Text.Formatting {
             }
         }
 
-        public static void FormatUInt64 (StringBuffer formatter, ulong value, StringView specifier, CachedCulture culture) {
+        public static void FormatUInt64 (BaseStringBuffer formatter, ulong value, StringView specifier, CachedCulture culture) {
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -175,7 +175,7 @@ namespace System.Text.Formatting {
             }
         }
 
-        public static void FormatSingle (StringBuffer formatter, float value, StringView specifier, CachedCulture culture) {
+        public static void FormatSingle (BaseStringBuffer formatter, float value, StringView specifier, CachedCulture culture) {
             int digits;
             int precision = FloatPrecision;
             var fmt = ParseFormatSpecifier(specifier, out digits);
@@ -218,7 +218,7 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void FormatDouble (StringBuffer formatter, double value, StringView specifier, CachedCulture culture) {
+        public static void FormatDouble (BaseStringBuffer formatter, double value, StringView specifier, CachedCulture culture) {
             int digits;
             int precision = DoublePrecision;
             var fmt = ParseFormatSpecifier(specifier, out digits);
@@ -261,7 +261,7 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void FormatDecimal (StringBuffer formatter, uint* value, StringView specifier, CachedCulture culture) {
+        public static void FormatDecimal (BaseStringBuffer formatter, uint* value, StringView specifier, CachedCulture culture) {
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -275,7 +275,7 @@ namespace System.Text.Formatting {
                 NumberToCustomFormatString(formatter, ref number, specifier, culture);
         }
 
-        static void NumberToString (StringBuffer formatter, ref Number number, char format, int maxDigits, CachedCulture culture, bool isDecimal = false) {
+        static void NumberToString (BaseStringBuffer formatter, ref Number number, char format, int maxDigits, CachedCulture culture, bool isDecimal = false) {
             // ANDing with 0xFFDF has the effect of uppercasing the character
             switch (format & 0xFFDF) {
                 case 'C':
@@ -632,7 +632,7 @@ namespace System.Text.Formatting {
             return buffer;
         }
 
-        static void Int32ToDecStr (StringBuffer formatter, int value, int digits, string negativeSign) {
+        static void Int32ToDecStr (BaseStringBuffer formatter, int value, int digits, string negativeSign) {
             if (digits < 1)
                 digits = 1;
 
@@ -657,7 +657,7 @@ namespace System.Text.Formatting {
             formatter.Append(p, (int)(buffer + bufferLength - p));
         }
 
-        static void UInt32ToDecStr (StringBuffer formatter, uint value, int digits) {
+        static void UInt32ToDecStr (BaseStringBuffer formatter, uint value, int digits) {
             var buffer = stackalloc char[100];
             if (digits < 1)
                 digits = 1;
@@ -666,7 +666,7 @@ namespace System.Text.Formatting {
             formatter.Append(p, (int)(buffer + 100 - p));
         }
 
-        static void Int32ToHexStr (StringBuffer formatter, uint value, int hexBase, int digits) {
+        static void Int32ToHexStr (BaseStringBuffer formatter, uint value, int hexBase, int digits) {
             var buffer = stackalloc char[100];
             if (digits < 1)
                 digits = 1;
@@ -675,7 +675,7 @@ namespace System.Text.Formatting {
             formatter.Append(p, (int)(buffer + 100 - p));
         }
 
-        static void Int64ToDecStr (StringBuffer formatter, long value, int digits, string negativeSign) {
+        static void Int64ToDecStr (BaseStringBuffer formatter, long value, int digits, string negativeSign) {
             if (digits < 1)
                 digits = 1;
 
@@ -708,7 +708,7 @@ namespace System.Text.Formatting {
             formatter.Append(p, (int)(buffer + bufferLength - p));
         }
 
-        static void UInt64ToDecStr (StringBuffer formatter, ulong value, int digits) {
+        static void UInt64ToDecStr (BaseStringBuffer formatter, ulong value, int digits) {
             if (digits < 1)
                 digits = 1;
 
@@ -723,7 +723,7 @@ namespace System.Text.Formatting {
             formatter.Append(p, (int)(buffer + 100 - p));
         }
 
-        static void Int64ToHexStr (StringBuffer formatter, ulong value, int hexBase, int digits) {
+        static void Int64ToHexStr (BaseStringBuffer formatter, ulong value, int hexBase, int digits) {
             var buffer = stackalloc char[100];
             char* ptr;
             if (High32(value) != 0) {

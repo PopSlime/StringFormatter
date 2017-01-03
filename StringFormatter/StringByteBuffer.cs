@@ -4,10 +4,11 @@ using System.Runtime.CompilerServices;
 
 namespace System.Text.Formatting
 {
+
     /// <summary>
     /// Specifies an interface for types that act as a set of formatting arguments.
     /// </summary>
-    public interface IArgSet
+    public interface IByteArgSet
     {
         /// <summary>
         /// The number of arguments in the set.
@@ -20,40 +21,42 @@ namespace System.Text.Formatting
         /// <param name="buffer">The buffer to which to append the argument.</param>
         /// <param name="index">The index of the argument to format.</param>
         /// <param name="format">A specifier indicating how the argument should be formatted.</param>
-        void Format(StringBuffer buffer, int index, StringView format);
+        void Format(StringByteBuffer buffer, int index, StringView format);
     }
 
     /// <summary>
     /// Defines an interface for types that can be formatted into a string buffer.
     /// </summary>
-    public interface IStringFormattable
+    public interface IByteStringFormattable
     {
         /// <summary>
         /// Format the current instance into the given string buffer.
         /// </summary>
         /// <param name="buffer">The buffer to which to append.</param>
         /// <param name="format">A specifier indicating how the argument should be formatted.</param>
-        void Format(StringBuffer buffer, StringView format);
+        void Format(StringByteBuffer buffer, StringView format);
     }
 
     /// <summary>
     /// A low-allocation version of the built-in <see cref="StringBuilder"/> type.
     /// </summary>
-    public sealed unsafe partial class StringBuffer : BaseStringBuffer
+    public sealed unsafe partial class StringByteBuffer : BaseStringBuffer
     {
-        char[] buffer;
-        int currentCount;
+        byte[] buffer;
+        int currentCharCount;
+        Encoding encoding;
+        int byteCount;
 
         /// <summary>
         /// The number of characters in the buffer.
         /// </summary>
-        public int Count { get { return currentCount; } }
+        public int Count => currentCharCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StringBuffer"/> class.
         /// </summary>
-        public StringBuffer()
-            : this(DefaultCapacity)
+        public StringByteBuffer()
+            : this(DefaultCapacity * 2)
         {
         }
 
@@ -61,9 +64,12 @@ namespace System.Text.Formatting
         /// Initializes a new instance of the <see cref="StringBuffer"/> class.
         /// </summary>
         /// <param name="capacity">The initial size of the string buffer.</param>
-        public StringBuffer(int capacity)
+        public StringByteBuffer(int capacity, Encoding encoding = null)
         {
-            buffer = new char[capacity];
+            buffer = new byte[capacity * 2];
+            this.encoding = encoding ?? Encoding.Default;
+
+            _spaceBytes = this.encoding.GetBytes(new [] {' '});
         }
 
         /// <summary>
@@ -71,7 +77,7 @@ namespace System.Text.Formatting
         /// </summary>
         /// <typeparam name="T">The type for which to set the formatter.</typeparam>
         /// <param name="formatter">A delegate that will be called to format instances of the specified type.</param>
-        public static void SetCustomFormatter<T>(Action<StringBuffer, T, StringView> formatter)
+        public static void SetCustomFormatter<T>(Action<StringByteBuffer, T, StringView> formatter)
         {
             ValueHelper<T>.Formatter = formatter;
         }
@@ -81,7 +87,8 @@ namespace System.Text.Formatting
         /// </summary>
         public void Clear()
         {
-            currentCount = 0;
+            currentCharCount = 0;
+            byteCount = 0;
         }
 
         /// <summary>
@@ -112,14 +119,14 @@ namespace System.Text.Formatting
         {
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
-            if (sourceIndex + count > currentCount || sourceIndex < 0)
+            if (sourceIndex + count > currentCharCount || sourceIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex));
 
-            fixed (char* s = buffer)
+            fixed (byte* s = buffer)
             {
                 var src = s + sourceIndex;
-                for (int i = 0; i < count; i++)
-                    *dest++ = *src++;
+                // TODO: Check the number of chars returned
+                encoding.GetChars(src, byteCount, dest, count);
             }
         }
 
@@ -136,13 +143,18 @@ namespace System.Text.Formatting
         {
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
-            if (sourceIndex + count > currentCount || sourceIndex < 0)
+            if (sourceIndex + count > currentCharCount || sourceIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex));
             if (encoding == null)
                 throw new ArgumentNullException(nameof(encoding));
 
-            fixed (char* s = &buffer[sourceIndex])
-                return encoding.GetBytes(s, count, dest, byteCount);
+            var bytesToWrite = Math.Min(count, byteCount);
+            // TODO: unsafe ?
+            for (int i = 0; i < bytesToWrite; i++)
+            {
+                dest[i] = buffer[sourceIndex + i];
+            }
+            return bytesToWrite;
         }
 
         /// <summary>
@@ -151,7 +163,7 @@ namespace System.Text.Formatting
         /// <returns>A new string representing the characters currently in the buffer.</returns>
         public override string ToString()
         {
-            return new string(buffer, 0, currentCount);
+            return encoding.GetString(buffer, 0, byteCount);
         }
 
         /// <summary>
@@ -174,12 +186,20 @@ namespace System.Text.Formatting
                 throw new ArgumentOutOfRangeException(nameof(count));
 
             CheckCapacity(count);
-            fixed (char* b = &buffer[currentCount])
+
+            fixed (byte* buf = &buffer[byteCount])
             {
-                var ptr = b;
-                for (int i = 0; i < count; i++)
-                    *ptr++ = c;
-                currentCount += count;
+                for (var i = 0; i < count; i++)
+                {
+                    var maxBytesToWrite = RemainingBytes;
+                    if (maxBytesToWrite <= 0)
+                        throw new ApplicationException("Not enough space in the buffer");
+
+                    var bytes = encoding.GetBytes(&c, 1, buf, maxBytesToWrite);
+                    byteCount += bytes;
+                }
+
+                currentCharCount += count;
             }
         }
 
@@ -237,12 +257,30 @@ namespace System.Text.Formatting
         public override void Append(char* str, int count)
         {
             CheckCapacity(count);
-            fixed (char* b = &buffer[currentCount])
+
+            fixed (byte* buf = &buffer[byteCount])
             {
-                var dest = b;
-                for (int i = 0; i < count; i++)
-                    *dest++ = *str++;
-                currentCount += count;
+                if (RemainingBytes < count * 2)
+                    throw new ApplicationException("Not enough space in the buffer");
+
+                var bytes = encoding.GetBytes(str, count, buf, RemainingBytes);
+                byteCount += bytes;
+                currentCharCount += count;
+            }
+        }
+
+        private void Append(byte[] charBytes, int count)
+        {
+            if (RemainingBytes < charBytes.Length * count)
+                throw new ApplicationException("Not enough space in the buffer");
+
+            for (var i = 0; i < count; i++)
+            {
+                for (var charIndex = 0; charIndex < charBytes.Length; charIndex++)
+                {
+                    buffer[byteCount + charIndex] = charBytes[charIndex];
+                    byteCount++;
+                }
             }
         }
 
@@ -265,7 +303,7 @@ namespace System.Text.Formatting
         /// <typeparam name="T">The type of argument set being formatted.</typeparam>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The set of args to insert into the format string.</param>
-        public void AppendArgSet<T>(string format, ref T args) where T : IArgSet
+        public void AppendArgSet<T>(string format, ref T args) where T : IByteArgSet
         {
             if (format == null)
                 throw new ArgumentNullException(nameof(format));
@@ -279,8 +317,10 @@ namespace System.Text.Formatting
                 do
                 {
                     CheckCapacity((int)(end - curr));
-                    fixed (char* bufferPtr = &buffer[currentCount])
+
+                    fixed (byte* bufferPtr = &buffer[byteCount])
                         segmentsLeft = AppendSegment(ref curr, end, bufferPtr, ref prevArgIndex, ref args);
+
                 } while (segmentsLeft);
             }
         }
@@ -288,14 +328,14 @@ namespace System.Text.Formatting
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void CheckCapacity(int count)
         {
-            if (currentCount + count > buffer.Length)
+            if (byteCount + count*2 > buffer.Length)
                 Array.Resize(ref buffer, buffer.Length * 2);
         }
 
-        bool AppendSegment<T>(ref char* currRef, char* end, char* dest, ref int prevArgIndex, ref T args) where T : IArgSet
+        bool AppendSegment<T>(ref char* currRef, char* end, byte* dest, ref int prevArgIndex, ref T args) where T : IByteArgSet
         {
-            char* curr = currRef;
-            char c = '\x0';
+            var curr = currRef;
+            var c = '\x0';
             while (curr < end)
             {
                 c = *curr++;
@@ -318,8 +358,10 @@ namespace System.Text.Formatting
                         break;
                 }
 
-                *dest++ = c;
-                currentCount++;
+                var bytes = encoding.GetBytes(&c, 1, dest, RemainingBytes);
+                dest += bytes;
+                byteCount += bytes;
+                currentCharCount++;
             }
 
             if (curr == end)
@@ -337,7 +379,8 @@ namespace System.Text.Formatting
             c = SkipWhitespace(ref curr, end);
             var width = 0;
             var leftJustify = false;
-            var oldCount = currentCount;
+            var oldCount = currentCharCount;
+            var oldByteCount = byteCount;
             if (c == ',')
             {
                 curr++;
@@ -409,22 +452,28 @@ namespace System.Text.Formatting
             }
 
             // finish off padding, if necessary
-            var padding = width - (currentCount - oldCount);
+            var padding = width - (currentCharCount - oldCount);
             if (padding > 0)
             {
                 if (leftJustify)
-                    Append(' ', padding);
+                {
+                    Append(_spaceBytes, padding);
+                }
                 else
                 {
                     // copy the recently placed chars up in memory to make room for padding
                     CheckCapacity(padding);
-                    for (int i = currentCount - 1; i >= oldCount; i--)
-                        buffer[i + padding] = buffer[i];
+                    var bytePadding = _spaceBytes.Length * padding;
+                    for (var i = byteCount - 1; i >= oldByteCount; i--)
+                        buffer[bytePadding + i] = buffer[i];
 
                     // fill in padding
-                    for (int i = 0; i < padding; i++)
-                        buffer[i + oldCount] = ' ';
-                    currentCount += padding;
+                    for (var i = 0; i < padding;)
+                        for (var spaceIndex = 0; spaceIndex < _spaceBytes.Length; spaceIndex++)
+                            buffer[oldByteCount + i++] = _spaceBytes[spaceIndex];
+
+                    byteCount += bytePadding;
+                    currentCharCount += padding;
                 }
             }
 
@@ -432,6 +481,8 @@ namespace System.Text.Formatting
             currRef = curr;
             return true;
         }
+
+        private int RemainingBytes => buffer.Length - byteCount;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void AppendGeneric<T>(IntPtr ptr, StringView format)
@@ -496,7 +547,7 @@ namespace System.Text.Formatting
                     // allocation, but presumably if the user is using us instead of the built-in
                     // formatting utilities they would rather be notified of this case, so
                     // we'll let the cast throw.
-                    var formattable = value as IStringFormattable;
+                    var formattable = value as IByteStringFormattable;
                     if (formattable == null)
                         throw new InvalidOperationException(string.Format(SR.TypeNotFormattable, typeof(T)));
                     formattable.Format(this, format);
@@ -506,12 +557,12 @@ namespace System.Text.Formatting
 
         static int ParseNum(ref char* currRef, char* end, int maxValue)
         {
-            char* curr = currRef;
-            char c = *curr;
+            var curr = currRef;
+            var c = *curr;
             if (c < '0' || c > '9')
                 ThrowError();
 
-            int value = 0;
+            var value = 0;
             do
             {
                 value = value * 10 + c - '0';
@@ -528,7 +579,7 @@ namespace System.Text.Formatting
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static char SkipWhitespace(ref char* currRef, char* end)
         {
-            char* curr = currRef;
+            var curr = currRef;
             while (curr < end && *curr == ' ')
                 curr++;
 
@@ -544,7 +595,7 @@ namespace System.Text.Formatting
             throw new FormatException(SR.InvalidFormatString);
         }
 
-        static StringBuffer Acquire(int capacity)
+        static StringByteBuffer Acquire(int capacity)
         {
             if (capacity <= MaxCachedSize)
             {
@@ -558,10 +609,10 @@ namespace System.Text.Formatting
                 }
             }
 
-            return new StringBuffer(capacity);
+            return new StringByteBuffer(capacity);
         }
 
-        static void Release(StringBuffer baseBuffer)
+        static void Release(StringByteBuffer baseBuffer)
         {
             var buffer = baseBuffer;
             if (buffer.buffer.Length <= MaxCachedSize)
@@ -569,7 +620,9 @@ namespace System.Text.Formatting
         }
 
         [ThreadStatic]
-        static StringBuffer CachedInstance;
+        static StringByteBuffer CachedInstance;
+        
+        private readonly byte [] _spaceBytes;
 
         const int DefaultCapacity = 32;
         const int MaxCachedSize = 360; // same as BCL's StringBuilderCache
@@ -587,9 +640,9 @@ namespace System.Text.Formatting
         // the parameter to the appropriate method in a strongly typed fashion.
         static class ValueHelper<T>
         {
-            public static Action<StringBuffer, T, StringView> Formatter = Prepare();
+            public static Action<StringByteBuffer, T, StringView> Formatter = Prepare();
 
-            static Action<StringBuffer, T, StringView> Prepare()
+            static Action<StringByteBuffer, T, StringView> Prepare()
             {
                 // we only use this class for value types that also implement IStringFormattable
                 var type = typeof(T);
@@ -600,7 +653,7 @@ namespace System.Text.Formatting
                     .GetMethod("Assign", BindingFlags.NonPublic | BindingFlags.Static)
                     .MakeGenericMethod(type)
                     .Invoke(null, null);
-                return (Action<StringBuffer, T, StringView>)result;
+                return (Action<StringByteBuffer, T, StringView>)result;
             }
 
             static Action<StringBuffer, U, StringView> Assign<U>() where U : IStringFormattable
