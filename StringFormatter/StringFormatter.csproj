@@ -44,6 +44,7 @@
     </Compile>
     <Compile Include="Culture.cs" />
     <Compile Include="CustomNumeric.cs" />
+    <Compile Include="Date.cs" />
     <Compile Include="Numeric.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SR.cs" />

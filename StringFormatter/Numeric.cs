@@ -739,7 +739,7 @@ namespace System.Text.Formatting {
             formatter.Append(ptr, (int)(buffer + 100 - ptr));
         }
 
-        static char* Int32ToDecChars (char* p, uint value, int digits) {
+        internal static char* Int32ToDecChars (char* p, uint value, int digits) {
             while (value != 0) {
                 *--p = (char)(value % 10 + '0');
                 value /= 10;

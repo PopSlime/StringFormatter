@@ -361,6 +361,11 @@ namespace System.Text.Formatting {
             Numeric.FormatDecimal(this, (uint*)&value, format, culture);
         }
 
+        private void Append(DateTime dateTime, StringView format)
+        {
+            Date.Format(this, dateTime, format);
+        }
+
         /// <summary>
         /// Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
         /// Each format item is replaced by the string representation of a single argument.
@@ -555,6 +560,8 @@ namespace System.Text.Formatting {
                 Append(*(bool*)ptr);
             else if (typeof(T) == typeof(char))
                 Append(*(char*)ptr, format);
+            else if (typeof(T) == typeof(DateTime))
+                Append(*(DateTime*)ptr, format);
             else if (typeof(T) == typeof(string)) {
                 var placeholder = default(T);
                 var tr = __makeref(placeholder);
