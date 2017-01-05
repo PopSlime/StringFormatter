@@ -17,5 +17,17 @@ namespace Test
 
             Check.That(buffer.ToString()).IsEqualTo("Guid de7bc307-699f-47a2-a0da-79c504edd68f");
         }
+
+        [Test]
+        [Repeat(50)]
+        public void should_format_many_guids()
+        {
+            var buffer = new StringBuffer();
+
+            var newGuid = Guid.NewGuid();
+            buffer.AppendFormat("Guid {0}", newGuid);
+
+            Check.That(buffer.ToString()).IsEqualTo($"Guid {newGuid}");
+        }
     }
 }
