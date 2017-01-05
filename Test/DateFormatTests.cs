@@ -42,7 +42,7 @@ namespace Test
             var buffer = new StringBuffer();
             buffer.AppendFormat("Timespan {0}", new TimeSpan(11, 01, 55));
             
-            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55");
+            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55.000");
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace Test
             var timeSpan = TimeSpan.FromSeconds(_fixture.Create<int>());
             buffer.AppendFormat("Timespan {0}", timeSpan);
 
-            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss")}");
+            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss\.fff")}");
         }
     }
 }

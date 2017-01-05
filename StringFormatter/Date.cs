@@ -32,6 +32,8 @@ namespace System.Text.Formatting
             AppendNumber(formatter, timeSpan.Minutes, 2, tempChars, tempCharsLength);
             formatter.Append(':');
             AppendNumber(formatter, timeSpan.Seconds, 2, tempChars, tempCharsLength);
+            formatter.Append('.');
+            AppendNumber(formatter, timeSpan.Milliseconds, 3, tempChars, tempCharsLength);
         }
 
         private static unsafe void AppendNumber(StringBuffer formatter, int value, int maxLength, char* tempChars, int tempCharsLength)
