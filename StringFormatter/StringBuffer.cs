@@ -371,6 +371,11 @@ namespace System.Text.Formatting {
             Date.Format(this, timespan, format);
         }
 
+        private void Append(Guid value, StringView format)
+        {
+            GuidFormatting.Format(this, value, format);
+        }
+        
         /// <summary>
         /// Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
         /// Each format item is replaced by the string representation of a single argument.
@@ -565,6 +570,8 @@ namespace System.Text.Formatting {
                 Append(*(bool*)ptr);
             else if (typeof(T) == typeof(char))
                 Append(*(char*)ptr, format);
+            else if (typeof(T) == typeof(Guid))
+                Append(*(Guid*)ptr, format);
             else if (typeof(T) == typeof(DateTime))
                 Append(*(DateTime*)ptr, format);
             else if (typeof(T) == typeof(TimeSpan))
