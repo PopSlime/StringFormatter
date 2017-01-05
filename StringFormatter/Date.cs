@@ -22,6 +22,18 @@ namespace System.Text.Formatting
             AppendNumber(formatter, dateTime.Millisecond, 3, tempChars, tempCharsLength);
         }
 
+        public static unsafe void Format(StringBuffer formatter, TimeSpan timeSpan, StringView format)
+        {
+            var tempCharsLength = 3;
+            char* tempChars = stackalloc char[tempCharsLength];
+
+            AppendNumber(formatter, timeSpan.Hours, 2, tempChars, tempCharsLength);
+            formatter.Append(':');
+            AppendNumber(formatter, timeSpan.Minutes, 2, tempChars, tempCharsLength);
+            formatter.Append(':');
+            AppendNumber(formatter, timeSpan.Seconds, 2, tempChars, tempCharsLength);
+        }
+
         private static unsafe void AppendNumber(StringBuffer formatter, int value, int maxLength, char* tempChars, int tempCharsLength)
         {
             var startOffset = tempCharsLength - maxLength;

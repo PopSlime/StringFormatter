@@ -361,9 +361,14 @@ namespace System.Text.Formatting {
             Numeric.FormatDecimal(this, (uint*)&value, format, culture);
         }
 
-        private void Append(DateTime dateTime, StringView format)
+        public void Append(DateTime dateTime, StringView format)
         {
             Date.Format(this, dateTime, format);
+        }
+
+        public void Append(TimeSpan timespan, StringView format)
+        {
+            Date.Format(this, timespan, format);
         }
 
         /// <summary>
@@ -562,6 +567,8 @@ namespace System.Text.Formatting {
                 Append(*(char*)ptr, format);
             else if (typeof(T) == typeof(DateTime))
                 Append(*(DateTime*)ptr, format);
+            else if (typeof(T) == typeof(TimeSpan))
+                Append(*(TimeSpan*)ptr, format);
             else if (typeof(T) == typeof(string)) {
                 var placeholder = default(T);
                 var tr = __makeref(placeholder);
