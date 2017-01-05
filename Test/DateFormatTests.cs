@@ -27,13 +27,24 @@ namespace Test
 
         [Test]
         [Repeat(50)]
-        public void should_multiple_times()
+        public void should_format_multiple_with_standard_date_format()
         {
             var buffer = new StringBuffer();
             var dateTime = _fixture.Create<DateTime>();
             buffer.AppendFormat("Date {0}", dateTime);
 
             Check.That(buffer.ToString()).IsEqualTo($"Date {dateTime:yyyy-MM-dd HH:mm:ss.fff}");
+        }
+
+        [Test]
+        [Repeat(50)]
+        public void should_format_multiple_with_short_date_format()
+        {
+            var buffer = new StringBuffer();
+            var dateTime = _fixture.Create<DateTime>();
+            buffer.AppendFormat("Date {0:yyyy-MM-dd}", dateTime);
+
+            Check.That(buffer.ToString()).IsEqualTo($"Date {dateTime:yyyy-MM-dd}");
         }
 
         [Test]

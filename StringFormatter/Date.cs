@@ -2,24 +2,54 @@ namespace System.Text.Formatting
 {
     internal class Date
     {
+        private static readonly string _standardFormat = "yyyy-MM-dd";
+
         public static unsafe void Format(StringBuffer formatter, DateTime dateTime, StringView format)
         {
             var tempCharsLength = 4;
             char* tempChars = stackalloc char[tempCharsLength];
 
-            AppendNumber(formatter, dateTime.Year, 4, tempChars, tempCharsLength);
-            formatter.Append('-');
-            AppendNumber(formatter, dateTime.Month, 2, tempChars, tempCharsLength);
-            formatter.Append('-');
-            AppendNumber(formatter, dateTime.Day, 2, tempChars, tempCharsLength);
-            formatter.Append(' ');
-            AppendNumber(formatter, dateTime.Hour, 2, tempChars, tempCharsLength);
-            formatter.Append(':');
-            AppendNumber(formatter, dateTime.Minute, 2, tempChars, tempCharsLength);
-            formatter.Append(':');
-            AppendNumber(formatter, dateTime.Second, 2, tempChars, tempCharsLength);
-            formatter.Append('.');
-            AppendNumber(formatter, dateTime.Millisecond, 3, tempChars, tempCharsLength);
+            if (IsStandardShortFormat(format))
+            {
+                AppendNumber(formatter, dateTime.Year, 4, tempChars, tempCharsLength);
+                formatter.Append('-');
+                AppendNumber(formatter, dateTime.Month, 2, tempChars, tempCharsLength);
+                formatter.Append('-');
+                AppendNumber(formatter, dateTime.Day, 2, tempChars, tempCharsLength);
+            }
+            else
+            {
+                AppendNumber(formatter, dateTime.Year, 4, tempChars, tempCharsLength);
+                formatter.Append('-');
+                AppendNumber(formatter, dateTime.Month, 2, tempChars, tempCharsLength);
+                formatter.Append('-');
+                AppendNumber(formatter, dateTime.Day, 2, tempChars, tempCharsLength);
+                formatter.Append(' ');
+                AppendNumber(formatter, dateTime.Hour, 2, tempChars, tempCharsLength);
+                formatter.Append(':');
+                AppendNumber(formatter, dateTime.Minute, 2, tempChars, tempCharsLength);
+                formatter.Append(':');
+                AppendNumber(formatter, dateTime.Second, 2, tempChars, tempCharsLength);
+                formatter.Append('.');
+                AppendNumber(formatter, dateTime.Millisecond, 3, tempChars, tempCharsLength);
+            }
+        }
+
+        private static unsafe bool IsStandardShortFormat(StringView format)
+        {
+            if (_standardFormat.Length != format.Length)
+                return false;
+
+            fixed (char* standardFormat = _standardFormat)
+            {
+                for (int i = 0; i < format.Length; i++)
+                {
+                    if (*(format.Data + i) != *(standardFormat + i))
+                        return false;
+                }
+            }
+
+            return true;
         }
 
         public static unsafe void Format(StringBuffer formatter, TimeSpan timeSpan, StringView format)
