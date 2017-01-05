@@ -27,7 +27,7 @@ namespace Test
 
         [Test]
         [Repeat(50)]
-        public void should_multiple_times()
+        public void should_format_multiple_with_standard_date_format()
         {
             var buffer = new StringBuffer();
             var dateTime = _fixture.Create<DateTime>();
@@ -37,12 +37,23 @@ namespace Test
         }
 
         [Test]
+        [Repeat(50)]
+        public void should_format_multiple_with_short_date_format()
+        {
+            var buffer = new StringBuffer();
+            var dateTime = _fixture.Create<DateTime>();
+            buffer.AppendFormat("Date {0:yyyy-MM-dd}", dateTime);
+
+            Check.That(buffer.ToString()).IsEqualTo($"Date {dateTime:yyyy-MM-dd}");
+        }
+
+        [Test]
         public void should_format_with_standard_timespan_format()
         {
             var buffer = new StringBuffer();
             buffer.AppendFormat("Timespan {0}", new TimeSpan(11, 01, 55));
             
-            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55");
+            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55.000");
         }
 
         [Test]
@@ -54,7 +65,7 @@ namespace Test
             var timeSpan = TimeSpan.FromSeconds(_fixture.Create<int>());
             buffer.AppendFormat("Timespan {0}", timeSpan);
 
-            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss")}");
+            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss\.fff")}");
         }
     }
 }
