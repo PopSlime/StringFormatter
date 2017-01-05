@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 
 namespace System.Text.Formatting {
     // Most of the implementation of this file was ported from the native versions built into the CLR
@@ -18,7 +12,10 @@ namespace System.Text.Formatting {
                 // if we're negative and doing a hex format, mask out the bits for the conversion
                 char c = specifier.Data[0];
                 if (c == 'X' || c == 'x')
+                {
                     FormatUInt32(formatter, (uint)(value & 0xFF), specifier, culture);
+                    return;
+                }
             }
 
             FormatInt32(formatter, value, specifier, culture);
@@ -29,7 +26,10 @@ namespace System.Text.Formatting {
                 // if we're negative and doing a hex format, mask out the bits for the conversion
                 char c = specifier.Data[0];
                 if (c == 'X' || c == 'x')
+                {
                     FormatUInt32(formatter, (uint)(value & 0xFFFF), specifier, culture);
+                    return;
+                }
             }
 
             FormatInt32(formatter, value, specifier, culture);
