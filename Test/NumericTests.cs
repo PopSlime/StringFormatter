@@ -74,7 +74,7 @@ namespace Test
         }
 
         [Test]
-        public void ShouldTestDoubles([Values("", "N0", "N2", "P0", "P2", "C0", "C2", "G", "G0", "G2", "E")]string format, [Random(double.MinValue, double.MaxValue, 20)]double floating)
+        public void ShouldTestDoubles([Values("", "N0", "N2", "P0", "P2", "C0", "C2", "G", "G0", "G2", "E")]string format, [Random(float.MinValue, float.MaxValue, 20)]double floating)
         {
             var buffer = new StringBuffer();
             buffer.AppendFormat($"{{0:{format}}}", floating);

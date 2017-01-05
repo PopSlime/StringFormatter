@@ -79,6 +79,7 @@ namespace Test {
             timer.Stop();
             Console.WriteLine("BCL  : {0} us/format", timer.ElapsedMilliseconds * 1000.0 / (count * mul));
             Console.WriteLine("GCs  : {0}", GC.CollectionCount(0) - gcCount);
+            Console.WriteLine("Done...");
         }
     }
 }
