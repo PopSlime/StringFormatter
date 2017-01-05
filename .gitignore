@@ -35,3 +35,5 @@ _ReSharper*/
 *.vspx
 packages/*
 output/*
+*.ncrunchsolution
+*.ncrunchproject
