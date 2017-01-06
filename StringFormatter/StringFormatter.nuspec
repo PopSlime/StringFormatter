@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>StringFormatter</id>
+    <version>1.0.0.1</version>
+    <authors>Michael Popoloski, Mendel Monteiro-Beckerman</authors>
+    <owners>mendel.monteiro</owners>
+    <licenseUrl>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/MendelMonteiro/StringFormatter</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Zero-allocation string formatting for .NET (a fork of https://github.com/MikePopoloski/StringFormatter)</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright © 2015 Michael Popoloski</copyright>
+    <tags>logging zero-allocation</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\StringFormatter.dll" target="lib\net45" />
+  </files>
+</package>

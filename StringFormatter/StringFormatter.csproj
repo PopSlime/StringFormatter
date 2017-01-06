@@ -53,10 +53,10 @@
     <Compile Include="StringView.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Arg.tt">
+    <None Include="Arg.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Arg.cs</LastGenOutput>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
