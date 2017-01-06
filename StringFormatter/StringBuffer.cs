@@ -361,17 +361,32 @@ namespace System.Text.Formatting {
             Numeric.FormatDecimal(this, (uint*)&value, format, culture);
         }
 
-        public void Append(DateTime dateTime, StringView format)
+        /// <summary>
+        /// Appends the specified value as a string to the current buffer.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        public void Append(DateTime value, StringView format)
         {
-            Date.Format(this, dateTime, format);
+            Date.Format(this, value, format);
         }
 
-        public void Append(TimeSpan timespan, StringView format)
+        /// <summary>
+        /// Appends the specified value as a string to the current buffer.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        public void Append(TimeSpan value, StringView format)
         {
-            Date.Format(this, timespan, format);
+            Date.Format(this, value, format);
         }
 
-        private void Append(Guid value, StringView format)
+        /// <summary>
+        /// Appends the specified value as a string to the current buffer.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        public void Append(Guid value, StringView format)
         {
             GuidFormatting.Format(this, value, format);
         }
