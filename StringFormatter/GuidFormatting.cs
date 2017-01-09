@@ -45,13 +45,6 @@ namespace System.Text.Formatting
                 default:
                     throw new FormatException(string.Format(SR.UnknownFormatSpecifier, format));
             }
-
-            Console.WriteLine("Appending : " + new string(guidChars, 0, offset));
-
-            var ptr = new IntPtr(guidChars);
-
-            Console.WriteLine(ptr);
-
             formatter.Append(guidChars, offset);
         }
 
