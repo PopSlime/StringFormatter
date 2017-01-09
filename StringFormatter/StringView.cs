@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace System.Text.Formatting {
+﻿namespace System.Text.Formatting {
     // TODO: clean this up
     public unsafe struct StringView {
         public static readonly StringView Empty = new StringView();
@@ -41,6 +35,11 @@ namespace System.Text.Formatting {
 
         public static bool operator !=(StringView lhs, string rhs) {
             return !(lhs == rhs);
+        }
+
+        public override string ToString()
+        {
+            return new string(Data, 0, Length);
         }
     }
 }

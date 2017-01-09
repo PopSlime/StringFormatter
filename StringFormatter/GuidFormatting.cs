@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Security;
 
 namespace System.Text.Formatting
 {
@@ -7,25 +6,100 @@ namespace System.Text.Formatting
     {
         public static unsafe void Format(StringBuffer formatter, Guid value, StringView format)
         {
-            var guidProxy = *((GuidProxy*)(&value));
-            char* guidChars = stackalloc char[36];
+            if (format.Length > 1)
+                throw new FormatException(string.Format(SR.UnknownFormatSpecifier, format));
 
-            // [{|(]dddddddd[-]dddd[-]dddd[-]dddd[-]dddddddddddd[}|)]
-            int offset = 0;
-            offset = HexsToChars(guidChars, offset, guidProxy.a >> 24, guidProxy.a >> 16);
-            offset = HexsToChars(guidChars, offset, guidProxy.a >> 8, guidProxy.a);
-            guidChars[offset++] = '-';
-            offset = HexsToChars(guidChars, offset, guidProxy.b >> 8, guidProxy.b);
-            guidChars[offset++] = '-';
-            offset = HexsToChars(guidChars, offset, guidProxy.c >> 8, guidProxy.c);
-            guidChars[offset++] = '-';
-            offset = HexsToChars(guidChars, offset, guidProxy.d, guidProxy.e);
-            guidChars[offset++] = '-';
-            offset = HexsToChars(guidChars, offset, guidProxy.f, guidProxy.g);
-            offset = HexsToChars(guidChars, offset, guidProxy.h, guidProxy.i);
-            offset = HexsToChars(guidChars, offset, guidProxy.j, guidProxy.k);
+            var guidProxy = *(GuidProxy*)&value;
+            var formatChar = format.IsEmpty ? 'D' : format.Data[0];
+            var guidChars = stackalloc char[68];
+            var offset = 0;
 
-            formatter.Append(guidChars, 36);
+            switch (formatChar)
+            {
+                case 'D':
+                case 'd':
+                    offset = GuidProxyToChars(guidChars, offset, guidProxy, true, false);
+                    break;
+                case 'N':
+                case 'n':
+                    offset = GuidProxyToChars(guidChars, offset, guidProxy, false, false);
+                    break;
+                case 'B':
+                case 'b':
+                    guidChars[offset++] = '{';
+                    offset = GuidProxyToChars(guidChars, offset, guidProxy, true, false);
+                    guidChars[offset++] = '}';
+                    break;
+                case 'P':
+                case 'p':
+                    guidChars[offset++] = '(';
+                    offset = GuidProxyToChars(guidChars, offset, guidProxy, true, false);
+                    guidChars[offset++] = ')';
+                    break;
+                case 'X':
+                case 'x':
+                    guidChars[offset++] = '{';
+                    offset = GuidProxyToChars(guidChars, offset, guidProxy, false, true);
+                    guidChars[offset++] = '}';
+                    break;
+                default:
+                    throw new FormatException(string.Format(SR.UnknownFormatSpecifier, format));
+            }
+
+            Console.WriteLine("Appending : " + new string(guidChars, 0, offset));
+
+            var ptr = new IntPtr(guidChars);
+
+            Console.WriteLine(ptr);
+
+            formatter.Append(guidChars, offset);
+        }
+
+        private static unsafe int GuidProxyToChars(char* chars, int offset, GuidProxy guidProxy, bool dash, bool hex)
+        {
+            if (hex)
+            {
+                // {0xdddddddd,0xdddd,0xdddd,{0xdd,0xdd,0xdd,0xdd,0xdd,0xdd,0xdd,0xdd}}
+                chars[offset++] = '0';
+                chars[offset++] = 'x';
+                offset = HexsToChars(chars, offset, guidProxy.a >> 24, guidProxy.a >> 16);
+                offset = HexsToChars(chars, offset, guidProxy.a >> 8, guidProxy.a);
+                chars[offset++] = ',';
+                chars[offset++] = '0';
+                chars[offset++] = 'x';
+                offset = HexsToChars(chars, offset, guidProxy.b >> 8, guidProxy.b);
+                chars[offset++] = ',';
+                chars[offset++] = '0';
+                chars[offset++] = 'x';
+                offset = HexsToChars(chars, offset, guidProxy.c >> 8, guidProxy.c);
+                chars[offset++] = ',';
+                chars[offset++] = '{';
+                offset = HexsToChars(chars, offset, guidProxy.d, guidProxy.e, true);
+                chars[offset++] = ',';
+                offset = HexsToChars(chars, offset, guidProxy.f, guidProxy.g, true);
+                chars[offset++] = ',';
+                offset = HexsToChars(chars, offset, guidProxy.h, guidProxy.i, true);
+                chars[offset++] = ',';
+                offset = HexsToChars(chars, offset, guidProxy.j, guidProxy.k, true);
+                chars[offset++] = '}';
+            }
+            else
+            {
+                // [{|(]dddddddd[-]dddd[-]dddd[-]dddd[-]dddddddddddd[}|)]
+                offset = HexsToChars(chars, offset, guidProxy.a >> 24, guidProxy.a >> 16);
+                offset = HexsToChars(chars, offset, guidProxy.a >> 8, guidProxy.a);
+                if (dash) chars[offset++] = '-';
+                offset = HexsToChars(chars, offset, guidProxy.b >> 8, guidProxy.b);
+                if (dash) chars[offset++] = '-';
+                offset = HexsToChars(chars, offset, guidProxy.c >> 8, guidProxy.c);
+                if (dash) chars[offset++] = '-';
+                offset = HexsToChars(chars, offset, guidProxy.d, guidProxy.e);
+                if (dash) chars[offset++] = '-';
+                offset = HexsToChars(chars, offset, guidProxy.f, guidProxy.g);
+                offset = HexsToChars(chars, offset, guidProxy.h, guidProxy.i);
+                offset = HexsToChars(chars, offset, guidProxy.j, guidProxy.k);
+            }
+            return offset;
         }
 
         private static char HexToChar(int a)
@@ -74,6 +148,5 @@ namespace System.Text.Formatting
             public byte j;
             public byte k;
         }
-
     }
 }
