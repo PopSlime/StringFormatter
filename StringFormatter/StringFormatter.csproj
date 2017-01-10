@@ -42,6 +42,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Arg.tt</DependentUpon>
     </Compile>
+    <Compile Include="AsciiString.cs" />
     <Compile Include="Culture.cs" />
     <Compile Include="CustomNumeric.cs" />
     <Compile Include="GuidFormatting.cs" />

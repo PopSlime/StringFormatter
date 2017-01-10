@@ -209,6 +209,22 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
+        /// Append an ascii string
+        /// </summary>
+        /// <param name="asciiString"></param>
+        public void Append(AsciiString asciiString)
+        {
+            var length = asciiString.Length;
+            CheckCapacity(length);
+
+            fixed (char* buf = &buffer[currentCount])
+            {
+                asciiString.CopyTo(buf);
+                currentCount += asciiString.Length;
+            }
+        }
+
+        /// <summary>
         /// Appends the specified string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
