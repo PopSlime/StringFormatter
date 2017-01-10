@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>StringFormatter</id>
-    <version>1.0.0.1</version>
+    <version>1.0.0.2</version>
     <authors>Michael Popoloski, Mendel Monteiro-Beckerman</authors>
     <owners>mendel.monteiro</owners>
     <licenseUrl>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</licenseUrl>
