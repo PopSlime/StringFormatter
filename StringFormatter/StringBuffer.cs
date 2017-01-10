@@ -191,6 +191,24 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
+        /// Append a byte array to the current buffer using the given encoding
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="length"></param>
+        /// <param name="encoding"></param>
+        public void Append(byte[] bytes, int length, Encoding encoding)
+        {
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            var count = length * 2;
+            CheckCapacity(count);
+
+            var charCount = encoding.GetChars(bytes, 0, length, buffer, currentCount);
+            currentCount += charCount;
+        }
+
+        /// <summary>
         /// Appends the specified string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
