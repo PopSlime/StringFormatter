@@ -1,3 +1,3 @@
-nuget pack ..\StringFormatter\StringFormatter.csproj -outputdirectory ..\output
+nuget pack ..\StringFormatter\StringFormatter.nuspec -outputdirectory ..\output
 
 pause
