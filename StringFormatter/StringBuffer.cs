@@ -104,15 +104,15 @@ namespace System.Text.Formatting {
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
         /// <param name="destination">The destination array.</param>
         /// <param name="destinationIndex">The index within the destination array to which to begin copying.</param>
-        /// <param name="count">The number of characters to copy.</param>
-        public void CopyTo (int sourceIndex, char[] destination, int destinationIndex, int count) {
+        /// <param name="charCount">The number of characters to copy.</param>
+        public void CopyTo (int sourceIndex, char[] destination, int destinationIndex, int charCount) {
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
-            if (destinationIndex + count > destination.Length || destinationIndex < 0)
+            if (destinationIndex + charCount > destination.Length || destinationIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(destinationIndex));
 
             fixed (char* destPtr = &destination[destinationIndex])
-                CopyTo(destPtr, sourceIndex, count);
+                CopyTo(destPtr, sourceIndex, charCount);
         }
 
         /// <summary>
@@ -140,19 +140,34 @@ namespace System.Text.Formatting {
         /// </summary>
         /// <param name="dest">A pointer to the destination byte array.</param>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
-        /// <param name="count">The number of characters to copy.</param>
+        /// <param name="charCount">The number of characters to copy.</param>
         /// <param name="encoding">The encoding to use to convert characters to bytes.</param>
         /// <returns>The number of bytes written to the destination.</returns>
-        public int CopyTo (byte* dest, int sourceIndex, int count, Encoding encoding) {
-            if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count));
-            if (sourceIndex + count > currentCount || sourceIndex < 0)
+        [Obsolete("Broken, assumes charCount == byteCount")]
+        public int CopyTo(byte* dest, int sourceIndex, int charCount, Encoding encoding)
+        {
+            return CopyTo(dest, charCount, sourceIndex, charCount, encoding);
+        }
+
+        /// <summary>
+        /// Copies the contents of the buffer to the given byte array.
+        /// </summary>
+        /// <param name="dest">A pointer to the destination byte array.</param>
+        /// <param name="maximumByteCount">The maximum number of bytes to write</param>
+        /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
+        /// <param name="charCount">The number of characters to copy.</param>
+        /// <param name="encoding">The encoding to use to convert characters to bytes.</param>
+        /// <returns>The number of bytes written to the destination.</returns>
+        public int CopyTo (byte* dest, int maximumByteCount, int sourceIndex, int charCount, Encoding encoding) {
+            if (charCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(charCount));
+            if (sourceIndex + charCount > currentCount || sourceIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex));
             if (encoding == null)
                 throw new ArgumentNullException(nameof(encoding));
 
             fixed (char* s = buffer)
-                return encoding.GetBytes(s, count, dest, count);
+                return encoding.GetBytes(s, charCount, dest, maximumByteCount);
         }
 
         /// <summary>
