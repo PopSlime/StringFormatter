@@ -418,8 +418,7 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void CheckCapacity (int count)
-        {
+        void CheckCapacity (int count) {
             var desiredCapacity = currentCount + count;
             if (desiredCapacity > buffer.Length)
                 Array.Resize(ref buffer, desiredCapacity * 2);
