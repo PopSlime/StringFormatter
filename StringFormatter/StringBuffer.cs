@@ -418,9 +418,11 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void CheckCapacity (int count) {
-            if (currentCount + count > buffer.Length)
-                Array.Resize(ref buffer, buffer.Length * 2);
+        void CheckCapacity (int count)
+        {
+            var desiredCapacity = currentCount + count;
+            if (desiredCapacity > buffer.Length)
+                Array.Resize(ref buffer, desiredCapacity * 2);
         }
 
         bool AppendSegment<T>(ref char* currRef, char* end, char* dest, ref int prevArgIndex, ref T args) where T : IArgSet {
