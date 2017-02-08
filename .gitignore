@@ -37,3 +37,6 @@ packages/*
 output/*
 *.ncrunchsolution
 *.ncrunchproject
+build/tools/*/
+build/tools/packages.config.md5sum
+build/tools/nuget.exe

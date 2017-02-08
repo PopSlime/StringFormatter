@@ -37,6 +37,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedVersionInfo.cs">
+      <Link>Properties\SharedVersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Arg.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
