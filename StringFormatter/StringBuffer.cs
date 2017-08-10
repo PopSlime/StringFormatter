@@ -45,7 +45,14 @@ namespace System.Text.Formatting {
         /// The number of characters in the buffer.
         /// </summary>
         public int Count {
-            get { return currentCount; }
+            get => currentCount;
+            set
+            {
+                if (value < currentCount)
+                    currentCount = value;
+                else if (value > currentCount)
+                    Append('\0', value - currentCount);
+            }
         }
 
         /// <summary>
@@ -439,7 +446,7 @@ namespace System.Text.Formatting {
         {
             GuidFormatting.Format(this, value, format);
         }
-        
+
         /// <summary>
         /// Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
         /// Each format item is replaced by the string representation of a single argument.
