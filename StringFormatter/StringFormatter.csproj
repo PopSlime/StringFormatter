@@ -1,76 +1,48 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8A0EF787-605F-44BA-AE5C-D616451F8724}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>System.Text.Formatting</RootNamespace>
-    <AssemblyName>StringFormatter</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <ApplicationIcon />
+    <OutputTypeEx>library</OutputTypeEx>
+    <StartupObject />
+    <VersionPrefix>1.0.0.7</VersionPrefix>
+    <TargetFrameworks>net451;netstandard1.5</TargetFrameworks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>Zero-allocation string formatting for .NET (a fork of https://github.com/MikePopoloski/StringFormatter)</Description>
+    <Copyright>Copyright ©  2015 Michael Popoloski	</Copyright>
+    <Product>StringFormatter</Product>
+    <PackageProjectUrl>https://github.com/MendelMonteiro/StringFormatter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MendelMonteiro/StringFormatter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>string format zero-alloc</PackageTags>
+    <PackageId>StringFormatter</PackageId>
+    <Authors>Michael Popoloski, Mendel Monteiro-Beckerman</Authors>
+    <PackageLicenseUrl>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Release\StringFormatter.XML</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\debug\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SharedVersionInfo.cs">
-      <Link>Properties\SharedVersionInfo.cs</Link>
-    </Compile>
-    <Compile Include="Arg.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Arg.tt</DependentUpon>
-    </Compile>
-    <Compile Include="AsciiString.cs" />
-    <Compile Include="Culture.cs" />
-    <Compile Include="CustomNumeric.cs" />
-    <Compile Include="GuidFormatting.cs" />
-    <Compile Include="Date.cs" />
-    <Compile Include="Numeric.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SR.cs" />
-    <Compile Include="StringBuffer.cs" />
-    <Compile Include="StringView.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Arg.tt">
+    <None Update="Arg.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Arg.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <Compile Update="Arg.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Arg.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

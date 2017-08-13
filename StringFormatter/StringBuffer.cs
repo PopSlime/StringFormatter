@@ -608,7 +608,7 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AppendGeneric<T>(IntPtr ptr, StringView format) {
+        internal void AppendGeneric<T>(void* ptr, StringView format) {
             // ptr here is a pointer to the parameter we want to format; for
             // simple value types we can cast the pointer directly, but for
             // strings and unknown generic value types we need to pull them
@@ -649,17 +649,11 @@ namespace System.Text.Formatting {
             else if (typeof(T) == typeof(TimeSpan))
                 Append(*(TimeSpan*)ptr, format);
             else if (typeof(T) == typeof(string)) {
-                var placeholder = default(T);
-                var tr = __makeref(placeholder);
-                *(IntPtr*)&tr = ptr;
-                Append(__refvalue(tr, string));
+                Append(Unsafe.Read<string>((void*) ptr));
             }
             else {
                 // otherwise, we have an unknown type; extract it from the pointer
-                var placeholder = default(T);
-                var tr = __makeref(placeholder);
-                *(IntPtr*)&tr = ptr;
-                var value = __refvalue(tr, T);
+                var value = Unsafe.Read<T>(ptr);
 
                 // first, check to see if it's a value type implementing IStringFormattable
                 var formatter = ValueHelper<T>.Formatter;
@@ -760,10 +754,18 @@ namespace System.Text.Formatting {
             static Action<StringBuffer, T, StringView> Prepare () {
                 // we only use this class for value types that also implement IStringFormattable
                 var type = typeof(T);
+#if NET451
                 if (!type.IsValueType || !typeof(IStringFormattable).IsAssignableFrom(type))
+#else
+                if (!type.GetTypeInfo().IsValueType || !typeof(IStringFormattable).GetTypeInfo().IsAssignableFrom(type))
+#endif
                     return null;
 
                 var result = typeof(ValueHelper<T>)
+#if NET451
+#else
+                    .GetTypeInfo()
+#endif
                     .GetMethod("Assign", BindingFlags.NonPublic | BindingFlags.Static)
                     .MakeGenericMethod(type)
                     .Invoke(null, null);
