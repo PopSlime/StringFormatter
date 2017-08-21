@@ -3,7 +3,7 @@
   <metadata>
     <id>StringFormatter</id>
     <version>1.0.0.6</version>
-    <authors>Michael Popoloski, Mendel Monteiro-Beckerman</authors>
+    <authors>Michael Popoloski, Mendel Monteiro-Beckerman, Reda Bouallou, Romain Verdier</authors>
     <owners>mendel.monteiro</owners>
     <licenseUrl>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/MendelMonteiro/StringFormatter</projectUrl>
@@ -12,9 +12,22 @@
     <releaseNotes></releaseNotes>
     <copyright>Copyright © 2015 Michael Popoloski</copyright>
     <tags>formatting zero-allocation</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard1.5">
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETFramework4.5.1">
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
-    <file src="Release\StringFormatter.dll" target="lib\net45" />
-    <file src="Release\StringFormatter.pdb" target="lib\net45" />
+    <file src="net451\StringFormatter.dll" target="lib\net45" />
+    <file src="net451\StringFormatter.pdb" target="lib\net45" />
+    <file src="netstandard1.5\StringFormatter.dll" target="lib\netstandard1.5" />
+    <file src="netstandard1.5\StringFormatter.pdb" target="lib\netstandard1.5" />
   </files>
 </package>

@@ -20,10 +20,10 @@
     <PackageLicenseUrl>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>bin\release\</OutputPath>
+    <OutputPath>$(BaseOutputPath)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>bin\debug\</OutputPath>
+    <OutputPath>$(BaseOutputPath)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Reflection" Version="4.3.0" />

@@ -8,6 +8,7 @@
 var target = Argument("target", "Default");
 var paths = new {
     solution = MakeAbsolute(File("./../StringFormatter.sln")).FullPath,
+    mainProject = MakeAbsolute(File("./../StringFormatter/StringFormatter.csproj")).FullPath,
     version = MakeAbsolute(File("./../version.yml")).FullPath,
     assemblyInfo = MakeAbsolute(File("./../SharedVersionInfo.cs")).FullPath,
     output = new {
@@ -23,10 +24,19 @@ ReadContext(paths.version);
 // HELPERS
 //////////////////////////////////////////////////////////////////////
 
+private void BuildMainProject(string configuration, string outputDirectoryPath)
+{
+    MSBuild(paths.mainProject, settings => settings.SetConfiguration(configuration)
+                                                .SetPlatformTarget(PlatformTarget.MSIL)
+                                                .UseToolVersion(MSBuildToolVersion.VS2017)
+                                                .WithProperty("BaseOutputPath", outputDirectoryPath));
+}
+
 private void Build(string configuration, string outputDirectoryPath)
 {
     MSBuild(paths.solution, settings => settings.SetConfiguration(configuration)
                                                 .SetPlatformTarget(PlatformTarget.MSIL)
+                                                .UseToolVersion(MSBuildToolVersion.VS2017)
                                                 .WithProperty("OutDir", outputDirectoryPath + "/" + configuration));
 }
 
@@ -50,6 +60,7 @@ Task("Create-AssemblyInfo").Does(()=>{
 });
 Task("Build-Debug").Does(() => Build("Debug", paths.output.build));
 Task("Build-Release").Does(() => Build("Release", paths.output.build));
+Task("Build-Main-Project-Release").Does(() => BuildMainProject("Release", paths.output.build));
 Task("Clean-AssemblyInfo").Does(() => FileWriteText(paths.assemblyInfo, string.Empty));
 Task("Run-Debug-Unit-Tests").Does(() => NUnit(paths.output.build + "/Debug/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
 Task("Run-Release-Unit-Tests").Does(() => NUnit(paths.output.build + "/Release/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
@@ -73,6 +84,7 @@ Task("Build")
     .IsDependentOn("Create-AssemblyInfo")
     .IsDependentOn("Build-Debug")
     .IsDependentOn("Build-Release")
+    .IsDependentOn("Build-Main-Project-Release")
     .IsDependentOn("Clean-AssemblyInfo");
 
 Task("Test")
