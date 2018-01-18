@@ -40,3 +40,5 @@ output/*
 build/tools/*/
 build/tools/packages.config.md5sum
 build/tools/nuget.exe
+.vs/*
+/StringFormatterBench/BenchmarkDotNet.Artifacts/results

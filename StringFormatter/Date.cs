@@ -11,27 +11,29 @@ namespace System.Text.Formatting
 
             if (IsStandardShortFormat(format))
             {
-                AppendNumber(formatter, dateTime.Year, 4, tempChars, tempCharsLength);
+                var(year, month, day) = dateTime;
+                AppendNumber(formatter, year, 4, tempChars, tempCharsLength);
                 formatter.Append('-');
-                AppendNumber(formatter, dateTime.Month, 2, tempChars, tempCharsLength);
+                AppendNumber(formatter, month, 2, tempChars, tempCharsLength);
                 formatter.Append('-');
-                AppendNumber(formatter, dateTime.Day, 2, tempChars, tempCharsLength);
+                AppendNumber(formatter, day, 2, tempChars, tempCharsLength);
             }
             else
             {
-                AppendNumber(formatter, dateTime.Year, 4, tempChars, tempCharsLength);
+                var(year, month, day, hour, minute, second, millisecond) = dateTime;
+                AppendNumber(formatter, year, 4, tempChars, tempCharsLength);
                 formatter.Append('-');
-                AppendNumber(formatter, dateTime.Month, 2, tempChars, tempCharsLength);
+                AppendNumber(formatter, month, 2, tempChars, tempCharsLength);
                 formatter.Append('-');
-                AppendNumber(formatter, dateTime.Day, 2, tempChars, tempCharsLength);
+                AppendNumber(formatter, day, 2, tempChars, tempCharsLength);
                 formatter.Append(' ');
-                AppendNumber(formatter, dateTime.Hour, 2, tempChars, tempCharsLength);
+                AppendNumber(formatter, hour, 2, tempChars, tempCharsLength);
                 formatter.Append(':');
-                AppendNumber(formatter, dateTime.Minute, 2, tempChars, tempCharsLength);
+                AppendNumber(formatter, minute, 2, tempChars, tempCharsLength);
                 formatter.Append(':');
-                AppendNumber(formatter, dateTime.Second, 2, tempChars, tempCharsLength);
+                AppendNumber(formatter, second, 2, tempChars, tempCharsLength);
                 formatter.Append('.');
-                AppendNumber(formatter, dateTime.Millisecond, 3, tempChars, tempCharsLength);
+                AppendNumber(formatter, millisecond, 3, tempChars, tempCharsLength);
             }
         }
 
@@ -42,7 +44,7 @@ namespace System.Text.Formatting
 
             fixed (char* standardFormat = _standardFormat)
             {
-                for (int i = 0; i < format.Length; i++)
+                for (var i = 0; i < format.Length; i++)
                 {
                     if (*(format.Data + i) != *(standardFormat + i))
                         return false;
