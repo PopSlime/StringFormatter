@@ -1,5 +1,5 @@
 #tool "nuget:?package=GitVersion.CommandLine"
-#addin "Cake.Yaml"
+#addin "Cake.Yaml&version=1.0.3.7"
 
 public class ContextInfo
 {
