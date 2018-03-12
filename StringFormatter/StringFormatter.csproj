@@ -5,7 +5,7 @@
     <OutputTypeEx>library</OutputTypeEx>
     <StartupObject />
     <VersionPrefix>1.0.0.7</VersionPrefix>
-    <TargetFrameworks>net451;netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>Zero-allocation string formatting for .NET (a fork of https://github.com/MikePopoloski/StringFormatter)</Description>
