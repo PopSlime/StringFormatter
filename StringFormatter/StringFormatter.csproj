@@ -29,9 +29,6 @@
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.4.0" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
-    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
-  </ItemGroup>
   <ItemGroup>
     <None Update="Arg.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
