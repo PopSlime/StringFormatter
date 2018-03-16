@@ -1,5 +1,6 @@
 #tool "nuget:?package=GitVersion.CommandLine"
 #addin "Cake.Yaml"
+#addin "nuget:?package=YamlDotNet"
 
 public class ContextInfo
 {

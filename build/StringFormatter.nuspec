@@ -18,15 +18,15 @@
         <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
         <dependency id="System.Reflection" version="4.3.0" exclude="Build,Analyzers" />
       </group>
-      <group targetFramework=".NETFramework4.5.1">
+      <group targetFramework=".NETFramework4.5">
         <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.4.0" exclude="Build,Analyzers" />
         <dependency id="System.Reflection" version="4.3.0" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="net451\StringFormatter.dll" target="lib\net45" />
-    <file src="net451\StringFormatter.pdb" target="lib\net45" />
+    <file src="net45\StringFormatter.dll" target="lib\net45" />
+    <file src="net45\StringFormatter.pdb" target="lib\net45" />
     <file src="netstandard1.5\StringFormatter.dll" target="lib\netstandard1.5" />
     <file src="netstandard1.5\StringFormatter.pdb" target="lib\netstandard1.5" />
   </files>
