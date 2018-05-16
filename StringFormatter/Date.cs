@@ -11,7 +11,7 @@ namespace System.Text.Formatting
 
             if (IsStandardShortFormat(format))
             {
-                var(year, month, day) = dateTime;
+                var (year, month, day) = dateTime;
                 AppendNumber(formatter, year, 4, tempChars, tempCharsLength);
                 formatter.Append('-');
                 AppendNumber(formatter, month, 2, tempChars, tempCharsLength);
@@ -56,16 +56,22 @@ namespace System.Text.Formatting
 
         public static unsafe void Format(StringBuffer formatter, TimeSpan timeSpan, StringView format)
         {
-            var tempCharsLength = 3;
+            var tempCharsLength = 7;
             char* tempChars = stackalloc char[tempCharsLength];
 
-            AppendNumber(formatter, timeSpan.Hours, 2, tempChars, tempCharsLength);
+            var (days, hours, minutes, seconds, ticks) = timeSpan;
+
+            if (days > 0) {
+                formatter.Append(days, format);
+                formatter.Append('.');
+            }
+            AppendNumber(formatter, hours, 2, tempChars, tempCharsLength);
             formatter.Append(':');
-            AppendNumber(formatter, timeSpan.Minutes, 2, tempChars, tempCharsLength);
+            AppendNumber(formatter, minutes, 2, tempChars, tempCharsLength);
             formatter.Append(':');
-            AppendNumber(formatter, timeSpan.Seconds, 2, tempChars, tempCharsLength);
+            AppendNumber(formatter, seconds, 2, tempChars, tempCharsLength);
             formatter.Append('.');
-            AppendNumber(formatter, timeSpan.Milliseconds, 3, tempChars, tempCharsLength);
+            AppendNumber(formatter, ticks, 7, tempChars, tempCharsLength);
         }
 
         private static unsafe void AppendNumber(StringBuffer formatter, int value, int maxLength, char* tempChars, int tempCharsLength)

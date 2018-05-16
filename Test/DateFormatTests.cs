@@ -21,7 +21,7 @@ namespace Test
         {
             var buffer = new StringBuffer();
             buffer.AppendFormat("Date {0}", new DateTime(2017, 01, 15, 11, 01, 55, 843));
-            
+
             Check.That(buffer.ToString()).IsEqualTo("Date 2017-01-15 11:01:55.843");
         }
 
@@ -52,20 +52,30 @@ namespace Test
         {
             var buffer = new StringBuffer();
             buffer.AppendFormat("Timespan {0}", new TimeSpan(11, 01, 55));
-            
-            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55.000");
+
+            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55.0000000");
         }
+
+        [Test]
+        public void should_format_with_standard_timespan_format_when_more_than_one_day()
+        {
+            var buffer = new StringBuffer();
+            buffer.AppendFormat("Timespan {0}", new TimeSpan(666, 11, 01, 55, 333));
+
+            Check.That(buffer.ToString()).IsEqualTo("Timespan 666.11:01:55.3330000");
+        }
+
 
         [Test]
         [Repeat(50)]
         public void should_format_many_with_standard_timespan_format()
         {
             var buffer = new StringBuffer();
-            
+
             var timeSpan = TimeSpan.FromSeconds(_fixture.Create<int>());
             buffer.AppendFormat("Timespan {0}", timeSpan);
 
-            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss\.fff")}");
+            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss\.fffffff")}");
         }
     }
 }
