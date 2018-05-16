@@ -4,8 +4,9 @@ namespace System.Text.Formatting
 {
     public static class DeconstructionExtensions
     {
-        private const long TicksPerMillisecond = 10000;
-        private const long TicksPerSecond = TicksPerMillisecond * 1000;
+        private const long TicksPerMicroSeconds = 10;
+        private const long TicksPerMillisecond = 10_000;
+        private const long TicksPerSecond = TicksPerMillisecond * 1_000;
         private const long TicksPerMinute = TicksPerSecond * 60;
         private const long TicksPerHour = TicksPerMinute * 60;
         private const long TicksPerDay = TicksPerHour * 24;
@@ -16,18 +17,25 @@ namespace System.Text.Formatting
         private static readonly int[] DaysToMonth365 = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
         private static readonly int[] DaysToMonth366 = {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366};
 
+        public static void Deconstruct(this TimeSpan timeSpan, out int days, out int hours, out int minutes, out int seconds, out int ticks)
+        {
+            var t = timeSpan.Ticks;
+            days         = (int)(t / (TicksPerHour * 24));
+            hours        = (int)((t / TicksPerHour) % 24);
+            minutes      = (int)((t / TicksPerMinute) % 60);
+            seconds      = (int)((t / TicksPerSecond) % 60);
+            ticks = (int)(t % 10_000_000);
+        }
+
         public static void Deconstruct(this DateTime date, out int year, out int month, out int day, out int hour, out int minute, out int second, out int millisecond)
         {
-            var (y, m, d) = date;
-            year = y;
-            month = m;
-            day = d;
+            (year, month, day) = date;
 
             var ticks = date.Ticks;
             hour = (int)((ticks / TicksPerHour) % 24);
             minute = (int)((ticks / TicksPerMinute) % 60);
             second = (int)((ticks / TicksPerSecond) % 60);
-            millisecond = (int)((ticks / TicksPerMillisecond) % 1000);
+            millisecond = (int)((ticks / TicksPerMillisecond) % 1_000);
         }
 
         public static void Deconstruct(this DateTime date, out int year, out int month, out int day)
