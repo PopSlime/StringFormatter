@@ -30,7 +30,7 @@ namespace StringFormatterBench
         const double v1 = 13.934939;
         const double v2 = 0;
 
-        [Setup]
+        [GlobalSetup]
         public void Setup() {
             _dest = (char*) Marshal.AllocHGlobal(128);
             _sb1 = new StringBuilder();
@@ -65,7 +65,7 @@ namespace StringFormatterBench
         const double v1 = 13.934939;
         const double v2 = 0;
 
-        [Setup]
+        [GlobalSetup]
         public void Setup() {
             DestNative = (char*)Marshal.AllocHGlobal(128);
             DestManaged = new char[128];
@@ -118,14 +118,6 @@ namespace StringFormatterBench
     }
 
     class Program {
-        static void Main(string[] args) {
-            var competition = new BenchmarkSwitcher(new[] {
-                typeof(StringFormatBenchmark),
-                typeof(NoAllocationBenchmark),
-                typeof(DateDeconstructBenchmark),
-            });
-
-            competition.Run(args);
-        }
-    }
+        static void Main(string[] args)
+            => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);    }
 }
