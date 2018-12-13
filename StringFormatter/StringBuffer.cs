@@ -111,15 +111,15 @@ namespace System.Text.Formatting {
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
         /// <param name="destination">The destination array.</param>
         /// <param name="destinationIndex">The index within the destination array to which to begin copying.</param>
-        /// <param name="charCount">The number of characters to copy.</param>
-        public void CopyTo (int sourceIndex, char[] destination, int destinationIndex, int charCount) {
+        /// <param name="count">The number of characters to copy.</param>
+        public void CopyTo (int sourceIndex, char[] destination, int destinationIndex, int count) {
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
-            if (destinationIndex + charCount > destination.Length || destinationIndex < 0)
+            if (destinationIndex + count > destination.Length || destinationIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(destinationIndex));
 
             fixed (char* destPtr = &destination[destinationIndex])
-                CopyTo(destPtr, sourceIndex, charCount);
+                CopyTo(destPtr, sourceIndex, count);
         }
 
         /// <summary>
@@ -147,14 +147,12 @@ namespace System.Text.Formatting {
         /// </summary>
         /// <param name="dest">A pointer to the destination byte array.</param>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
-        /// <param name="charCount">The number of characters to copy.</param>
+        /// <param name="count">The number of characters to copy.</param>
         /// <param name="encoding">The encoding to use to convert characters to bytes.</param>
         /// <returns>The number of bytes written to the destination.</returns>
         [Obsolete("Broken, assumes charCount == byteCount")]
-        public int CopyTo(byte* dest, int sourceIndex, int charCount, Encoding encoding)
-        {
-            return CopyTo(dest, charCount, sourceIndex, charCount, encoding);
-        }
+        public int CopyTo(byte* dest, int sourceIndex, int count, Encoding encoding) =>
+            CopyTo(dest, count, sourceIndex, count, encoding);
 
         /// <summary>
         /// Copies the contents of the buffer to the given byte array.
@@ -162,20 +160,61 @@ namespace System.Text.Formatting {
         /// <param name="dest">A pointer to the destination byte array.</param>
         /// <param name="maximumByteCount">The maximum number of bytes to write</param>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
-        /// <param name="charCount">The number of characters to copy.</param>
+        /// <param name="count">The number of characters to copy.</param>
         /// <param name="encoding">The encoding to use to convert characters to bytes.</param>
         /// <returns>The number of bytes written to the destination.</returns>
-        public int CopyTo (byte* dest, int maximumByteCount, int sourceIndex, int charCount, Encoding encoding) {
-            if (charCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(charCount));
-            if (sourceIndex + charCount > currentCount || sourceIndex < 0)
+        public int CopyTo (byte* dest, int maximumByteCount, int sourceIndex, int count, Encoding encoding) {
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+            if (sourceIndex + count > currentCount || sourceIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex));
             if (encoding == null)
                 throw new ArgumentNullException(nameof(encoding));
 
             fixed (char* s = buffer)
-                return encoding.GetBytes(s, charCount, dest, maximumByteCount);
+                return encoding.GetBytes(s, count, dest, maximumByteCount);
         }
+        /// <summary>
+        /// Copies the contents of the buffer to the given <see cref="Span{char}"/>.
+        /// </summary>
+        /// <param name="dest">The destination span.</param>
+        /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
+        /// <param name="count">The number of characters to copy.</param>
+        public void CopyTo (Span<char> dest, int sourceIndex, int count) =>
+            new ReadOnlySpan<char>(buffer, sourceIndex, count).CopyTo(dest);
+
+#if NETCOREAPP2_1
+        /// <summary>
+        /// Copies the contents of the buffer to the given <see cref="Span{byte}"/>.
+        /// </summary>
+        /// <param name="dest">The destination span.</param>
+        /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
+        /// <param name="count">The number of characters to copy.</param>
+        /// <param name="encoding">The <see cref="System.Encoding"/> to use for the destination buffer</param>
+        public int CopyTo (Span<byte> dest, int sourceIndex, int count, Encoding encoding) {
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+
+            return encoding.GetBytes(new ReadOnlySpan<char>(buffer, sourceIndex, count), dest);
+        }
+#else
+        /// <summary>
+        /// Copies the contents of the buffer to the given <see cref="Span{byte}"/>.
+        /// </summary>
+        /// <param name="dest">The destination span.</param>
+        /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
+        /// <param name="count">The number of characters to copy.</param>
+        /// <param name="encoding">The <see cref="System.Encoding"/> to use for the destination buffer</param>
+        public int CopyTo (Span<byte> dest, int sourceIndex, int count, Encoding encoding) {
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+
+            ref var r0 = ref dest.GetPinnableReference();
+            fixed (byte* dp = &Unsafe.As<byte, byte>(ref r0))
+            fixed (char* s = buffer)
+                return encoding.GetBytes(s, count, dp, dest.Length);
+        }
+#endif
 
         /// <summary>
         /// Converts the buffer to a string instance.
@@ -202,7 +241,7 @@ namespace System.Text.Formatting {
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
 
-            CheckCapacity(count);
+            EnsureCapcity(count);
             fixed (char* b = &buffer[currentCount])
             {
                 var ptr = b;
@@ -224,7 +263,7 @@ namespace System.Text.Formatting {
                 throw new ArgumentOutOfRangeException(nameof(length));
 
             var count = length * 2;
-            CheckCapacity(count);
+            EnsureCapcity(count);
 
             var charCount = encoding.GetChars(bytes, 0, length, buffer, currentCount);
             currentCount += charCount;
@@ -237,7 +276,7 @@ namespace System.Text.Formatting {
         public void Append(AsciiString asciiString)
         {
             var length = asciiString.Length;
-            CheckCapacity(length);
+            EnsureCapcity(length);
 
             fixed (char* buf = &buffer[currentCount])
             {
@@ -295,7 +334,7 @@ namespace System.Text.Formatting {
         /// <param name="str">A pointer to the array of characters to append.</param>
         /// <param name="count">The number of characters to append.</param>
         public void Append (char* str, int count) {
-            CheckCapacity(count);
+            EnsureCapcity(count);
             fixed (char* b = &buffer[currentCount])
             {
                 var dest = b;
@@ -303,6 +342,16 @@ namespace System.Text.Formatting {
                     *dest++ = *str++;
                 currentCount += count;
             }
+        }
+
+        /// <summary>
+        /// Appends an array of characters to the current buffer.
+        /// </summary>
+        /// <param name="str">The <see cref="ReadOnlySpan{char}"/> to append.</param>
+        public void Append (ReadOnlySpan<char> str) {
+            EnsureCapcity(str.Length);
+            str.CopyTo(new Span<char>(buffer, currentCount, str.Length));
+            currentCount += str.Length;
         }
 
         /// <summary>
@@ -458,6 +507,7 @@ namespace System.Text.Formatting {
             if (format == null)
                 throw new ArgumentNullException(nameof(format));
 
+
             fixed (char* formatPtr = format)
             {
                 var curr = formatPtr;
@@ -465,7 +515,7 @@ namespace System.Text.Formatting {
                 var segmentsLeft = false;
                 var prevArgIndex = 0;
                 do {
-                    CheckCapacity((int)(end - curr));
+                    EnsureCapcity((int)(end - curr));
                     fixed (char* bufferPtr = &buffer[currentCount])
                         segmentsLeft = AppendSegment(ref curr, end, bufferPtr, ref prevArgIndex, ref args);
                 }
@@ -474,7 +524,7 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void CheckCapacity (int count) {
+        void EnsureCapcity(int count) {
             var desiredCapacity = currentCount + count;
             if (desiredCapacity > buffer.Length)
                 Array.Resize(ref buffer, desiredCapacity * 2);
@@ -591,7 +641,7 @@ namespace System.Text.Formatting {
                     Append(' ', padding);
                 else {
                     // copy the recently placed chars up in memory to make room for padding
-                    CheckCapacity(padding);
+                    EnsureCapcity(padding);
                     for (int i = currentCount - 1; i >= oldCount; i--)
                         buffer[i + padding] = buffer[i];
 
@@ -715,7 +765,7 @@ namespace System.Text.Formatting {
                 if (buffer != null) {
                     CachedInstance = null;
                     buffer.Clear();
-                    buffer.CheckCapacity(capacity);
+                    buffer.EnsureCapcity(capacity);
                     return buffer;
                 }
             }
