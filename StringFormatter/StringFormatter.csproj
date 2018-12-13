@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\netfx.props" />
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <ApplicationIcon />
-    <OutputTypeEx>library</OutputTypeEx>
-    <StartupObject />
     <VersionPrefix>1.0.0.7</VersionPrefix>
-    <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard1.5</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>Zero-allocation string formatting for .NET (a fork of https://github.com/MikePopoloski/StringFormatter)</Description>
@@ -19,16 +17,13 @@
     <Authors>Michael Popoloski, Mendel Monteiro-Beckerman</Authors>
     <PackageLicenseUrl>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>$(BaseOutputPath)</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>$(BaseOutputPath)</OutputPath>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.4.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="netstandard" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Arg.tt">

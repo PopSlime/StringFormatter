@@ -36,7 +36,7 @@ namespace System.Text.Formatting {
     /// <summary>
     /// A low-allocation version of the built-in <see cref="StringBuilder"/> type.
     /// </summary>
-    public unsafe sealed partial class StringBuffer {
+    public sealed unsafe partial class StringBuffer {
         CachedCulture culture;
         char[] buffer;
         int currentCount;
@@ -59,7 +59,7 @@ namespace System.Text.Formatting {
         /// The culture used to format string data.
         /// </summary>
         public CultureInfo Culture {
-            get { return culture.Culture; }
+            get => culture.Culture;
             set {
                 if (culture.Culture == value)
                     return;
