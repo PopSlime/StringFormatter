@@ -2,49 +2,54 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace System.Text.Formatting {
+namespace System.Text.Formatting
+{
     /// <summary>
-    /// Specifies an interface for types that act as a set of formatting arguments.
+    ///     Specifies an interface for types that act as a set of formatting arguments.
     /// </summary>
-    public interface IArgSet {
+    public interface IArgSet
+    {
         /// <summary>
-        /// The number of arguments in the set.
+        ///     The number of arguments in the set.
         /// </summary>
         int Count { get; }
 
         /// <summary>
-        /// Format one of the arguments in the set into the given string buffer.
+        ///     Format one of the arguments in the set into the given string buffer.
         /// </summary>
         /// <param name="buffer">The buffer to which to append the argument.</param>
         /// <param name="index">The index of the argument to format.</param>
         /// <param name="format">A specifier indicating how the argument should be formatted.</param>
-        void Format (StringBuffer buffer, int index, StringView format);
+        void Format(StringBuffer buffer, int index, StringView format);
     }
 
     /// <summary>
-    /// Defines an interface for types that can be formatted into a string buffer.
+    ///     Defines an interface for types that can be formatted into a string buffer.
     /// </summary>
-    public interface IStringFormattable {
+    public interface IStringFormattable
+    {
         /// <summary>
-        /// Format the current instance into the given string buffer.
+        ///     Format the current instance into the given string buffer.
         /// </summary>
         /// <param name="buffer">The buffer to which to append.</param>
         /// <param name="format">A specifier indicating how the argument should be formatted.</param>
-        void Format (StringBuffer buffer, StringView format);
+        void Format(StringBuffer buffer, StringView format);
     }
 
     /// <summary>
-    /// A low-allocation version of the built-in <see cref="StringBuilder"/> type.
+    ///     A low-allocation version of the built-in <see cref="StringBuilder" /> type.
     /// </summary>
-    public sealed unsafe partial class StringBuffer {
+    public sealed unsafe partial class StringBuffer
+    {
         CachedCulture culture;
         char[] buffer;
         int currentCount;
 
         /// <summary>
-        /// The number of characters in the buffer.
+        ///     The number of characters in the buffer.
         /// </summary>
-        public int Count {
+        public int Count
+        {
             get => currentCount;
             set
             {
@@ -56,11 +61,13 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// The culture used to format string data.
+        ///     The culture used to format string data.
         /// </summary>
-        public CultureInfo Culture {
+        public CultureInfo Culture
+        {
             get => culture.Culture;
-            set {
+            set
+            {
                 if (culture.Culture == value)
                     return;
 
@@ -74,45 +81,50 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringBuffer"/> class.
+        ///     Initializes a new instance of the <see cref="StringBuffer" /> class.
         /// </summary>
-        public StringBuffer ()
-            : this(DefaultCapacity) {
+        public StringBuffer()
+            : this(DefaultCapacity)
+        {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringBuffer"/> class.
+        ///     Initializes a new instance of the <see cref="StringBuffer" /> class.
         /// </summary>
         /// <param name="capacity">The initial size of the string buffer.</param>
-        public StringBuffer (int capacity) {
+        public StringBuffer(int capacity)
+        {
             buffer = new char[capacity];
             culture = CachedCurrentCulture;
         }
 
         /// <summary>
-        /// Sets a custom formatter to use when converting instances of a given type to a string.
+        ///     Sets a custom formatter to use when converting instances of a given type to a string.
         /// </summary>
         /// <typeparam name="T">The type for which to set the formatter.</typeparam>
         /// <param name="formatter">A delegate that will be called to format instances of the specified type.</param>
-        public static void SetCustomFormatter<T>(Action<StringBuffer, T, StringView> formatter) {
+        public static void SetCustomFormatter<T>(Action<StringBuffer, T, StringView> formatter)
+        {
             ValueHelper<T>.Formatter = formatter;
         }
 
         /// <summary>
-        /// Clears the buffer.
+        ///     Clears the buffer.
         /// </summary>
-        public void Clear () {
+        public void Clear()
+        {
             currentCount = 0;
         }
 
         /// <summary>
-        /// Copies the contents of the buffer to the given array.
+        ///     Copies the contents of the buffer to the given array.
         /// </summary>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
         /// <param name="destination">The destination array.</param>
         /// <param name="destinationIndex">The index within the destination array to which to begin copying.</param>
         /// <param name="count">The number of characters to copy.</param>
-        public void CopyTo (int sourceIndex, char[] destination, int destinationIndex, int count) {
+        public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
             if (destinationIndex + count > destination.Length || destinationIndex < 0)
@@ -123,12 +135,13 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Copies the contents of the buffer to the given array.
+        ///     Copies the contents of the buffer to the given array.
         /// </summary>
         /// <param name="dest">A pointer to the destination array.</param>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
         /// <param name="count">The number of characters to copy.</param>
-        public void CopyTo (char* dest, int sourceIndex, int count) {
+        public void CopyTo(char* dest, int sourceIndex, int count)
+        {
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
             if (sourceIndex + count > currentCount || sourceIndex < 0)
@@ -137,13 +150,13 @@ namespace System.Text.Formatting {
             fixed (char* s = buffer)
             {
                 var src = s + sourceIndex;
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                     *dest++ = *src++;
             }
         }
 
         /// <summary>
-        /// Copies the contents of the buffer to the given byte array.
+        ///     Copies the contents of the buffer to the given byte array.
         /// </summary>
         /// <param name="dest">A pointer to the destination byte array.</param>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
@@ -151,11 +164,10 @@ namespace System.Text.Formatting {
         /// <param name="encoding">The encoding to use to convert characters to bytes.</param>
         /// <returns>The number of bytes written to the destination.</returns>
         [Obsolete("Broken, assumes charCount == byteCount")]
-        public int CopyTo(byte* dest, int sourceIndex, int count, Encoding encoding) =>
-            CopyTo(dest, count, sourceIndex, count, encoding);
+        public int CopyTo(byte* dest, int sourceIndex, int count, Encoding encoding) => CopyTo(dest, count, sourceIndex, count, encoding);
 
         /// <summary>
-        /// Copies the contents of the buffer to the given byte array.
+        ///     Copies the contents of the buffer to the given byte array.
         /// </summary>
         /// <param name="dest">A pointer to the destination byte array.</param>
         /// <param name="maximumByteCount">The maximum number of bytes to write</param>
@@ -163,7 +175,8 @@ namespace System.Text.Formatting {
         /// <param name="count">The number of characters to copy.</param>
         /// <param name="encoding">The encoding to use to convert characters to bytes.</param>
         /// <returns>The number of bytes written to the destination.</returns>
-        public int CopyTo (byte* dest, int maximumByteCount, int sourceIndex, int count, Encoding encoding) {
+        public int CopyTo(byte* dest, int maximumByteCount, int sourceIndex, int count, Encoding encoding)
+        {
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
             if (sourceIndex + count > currentCount || sourceIndex < 0)
@@ -174,23 +187,23 @@ namespace System.Text.Formatting {
             fixed (char* s = buffer)
                 return encoding.GetBytes(s, count, dest, maximumByteCount);
         }
+
         /// <summary>
-        /// Copies the contents of the buffer to the given <see cref="Span{char}"/>.
+        ///     Copies the contents of the buffer to the given <see cref="Span{char}" />.
         /// </summary>
         /// <param name="dest">The destination span.</param>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
         /// <param name="count">The number of characters to copy.</param>
-        public void CopyTo (Span<char> dest, int sourceIndex, int count) =>
-            new ReadOnlySpan<char>(buffer, sourceIndex, count).CopyTo(dest);
+        public void CopyTo(Span<char> dest, int sourceIndex, int count) => new ReadOnlySpan<char>(buffer, sourceIndex, count).CopyTo(dest);
 
 #if NETCOREAPP2_1
-        /// <summary>
-        /// Copies the contents of the buffer to the given <see cref="Span{byte}"/>.
-        /// </summary>
-        /// <param name="dest">The destination span.</param>
-        /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
-        /// <param name="count">The number of characters to copy.</param>
-        /// <param name="encoding">The <see cref="System.Encoding"/> to use for the destination buffer</param>
+/// <summary>
+/// Copies the contents of the buffer to the given <see cref="Span{byte}"/>.
+/// </summary>
+/// <param name="dest">The destination span.</param>
+/// <param name="sourceIndex">The index within the buffer to begin copying.</param>
+/// <param name="count">The number of characters to copy.</param>
+/// <param name="encoding">The <see cref="System.Encoding"/> to use for the destination buffer</param>
         public int CopyTo (Span<byte> dest, int sourceIndex, int count, Encoding encoding) {
             if (encoding == null)
                 throw new ArgumentNullException(nameof(encoding));
@@ -199,13 +212,14 @@ namespace System.Text.Formatting {
         }
 #else
         /// <summary>
-        /// Copies the contents of the buffer to the given <see cref="Span{byte}"/>.
+        ///     Copies the contents of the buffer to the given <see cref="Span{byte}" />.
         /// </summary>
         /// <param name="dest">The destination span.</param>
         /// <param name="sourceIndex">The index within the buffer to begin copying.</param>
         /// <param name="count">The number of characters to copy.</param>
-        /// <param name="encoding">The <see cref="System.Encoding"/> to use for the destination buffer</param>
-        public int CopyTo (Span<byte> dest, int sourceIndex, int count, Encoding encoding) {
+        /// <param name="encoding">The <see cref="System.Encoding" /> to use for the destination buffer</param>
+        public int CopyTo(Span<byte> dest, int sourceIndex, int count, Encoding encoding)
+        {
             if (encoding == null)
                 throw new ArgumentNullException(nameof(encoding));
 
@@ -217,27 +231,30 @@ namespace System.Text.Formatting {
 #endif
 
         /// <summary>
-        /// Converts the buffer to a string instance.
+        ///     Converts the buffer to a string instance.
         /// </summary>
         /// <returns>A new string representing the characters currently in the buffer.</returns>
-        public override string ToString () {
+        public override string ToString()
+        {
             return new string(buffer, 0, currentCount);
         }
 
         /// <summary>
-        /// Appends a character to the current buffer.
+        ///     Appends a character to the current buffer.
         /// </summary>
         /// <param name="c">The character to append.</param>
-        public void Append (char c) {
+        public void Append(char c)
+        {
             Append(c, 1);
         }
 
         /// <summary>
-        /// Appends a character to the current buffer several times.
+        ///     Appends a character to the current buffer several times.
         /// </summary>
         /// <param name="c">The character to append.</param>
         /// <param name="count">The number of times to append the character.</param>
-        public void Append (char c, int count) {
+        public void Append(char c, int count)
+        {
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
 
@@ -245,14 +262,14 @@ namespace System.Text.Formatting {
             fixed (char* b = &buffer[currentCount])
             {
                 var ptr = b;
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                     *ptr++ = c;
                 currentCount += count;
             }
         }
 
         /// <summary>
-        /// Append a byte array to the current buffer using the given encoding
+        ///     Append a byte array to the current buffer using the given encoding
         /// </summary>
         /// <param name="bytes"></param>
         /// <param name="length"></param>
@@ -270,7 +287,7 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Append an ascii string
+        ///     Append an ascii string
         /// </summary>
         /// <param name="asciiString"></param>
         public void Append(AsciiString asciiString)
@@ -286,10 +303,11 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Appends the specified string to the current buffer.
+        ///     Appends the specified string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        public void Append (string value) {
+        public void Append(string value)
+        {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
@@ -297,12 +315,13 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Appends a string subset to the current buffer.
+        ///     Appends a string subset to the current buffer.
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <param name="startIndex">The starting index within the string to begin reading characters.</param>
         /// <param name="count">The number of characters to append.</param>
-        public void Append (string value, int startIndex, int count) {
+        public void Append(string value, int startIndex, int count)
+        {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
             if (startIndex < 0 || startIndex + count > value.Length)
@@ -313,12 +332,13 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Appends an array of characters to the current buffer.
+        ///     Appends an array of characters to the current buffer.
         /// </summary>
         /// <param name="values">The characters to append.</param>
         /// <param name="startIndex">The starting index within the array to begin reading characters.</param>
         /// <param name="count">The number of characters to append.</param>
-        public void Append (char[] values, int startIndex, int count) {
+        public void Append(char[] values, int startIndex, int count)
+        {
             if (values == null)
                 throw new ArgumentNullException(nameof(values));
             if (startIndex < 0 || startIndex + count > values.Length)
@@ -329,36 +349,39 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Appends an array of characters to the current buffer.
+        ///     Appends an array of characters to the current buffer.
         /// </summary>
         /// <param name="str">A pointer to the array of characters to append.</param>
         /// <param name="count">The number of characters to append.</param>
-        public void Append (char* str, int count) {
+        public void Append(char* str, int count)
+        {
             EnsureCapcity(count);
             fixed (char* b = &buffer[currentCount])
             {
                 var dest = b;
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                     *dest++ = *str++;
                 currentCount += count;
             }
         }
 
         /// <summary>
-        /// Appends an array of characters to the current buffer.
+        ///     Appends an array of characters to the current buffer.
         /// </summary>
-        /// <param name="str">The <see cref="ReadOnlySpan{char}"/> to append.</param>
-        public void Append (ReadOnlySpan<char> str) {
+        /// <param name="str">The <see cref="ReadOnlySpan{char}" /> to append.</param>
+        public void Append(ReadOnlySpan<char> str)
+        {
             EnsureCapcity(str.Length);
             str.CopyTo(new Span<char>(buffer, currentCount, str.Length));
             currentCount += str.Length;
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        public void Append (bool value) {
+        public void Append(bool value)
+        {
             if (value)
                 Append(TrueLiteral);
             else
@@ -366,147 +389,159 @@ namespace System.Text.Formatting {
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (sbyte value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(sbyte value, StringView format)
+        {
             Numeric.FormatSByte(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (byte value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(byte value, StringView format)
+        {
             // widening here is fine
             Numeric.FormatUInt32(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (short value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(short value, StringView format)
+        {
             Numeric.FormatInt16(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (ushort value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(ushort value, StringView format)
+        {
             // widening here is fine
             Numeric.FormatUInt32(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (int value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(int value, StringView format)
+        {
             Numeric.FormatInt32(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (uint value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(uint value, StringView format)
+        {
             Numeric.FormatUInt32(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (long value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(long value, StringView format)
+        {
             Numeric.FormatInt64(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (ulong value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(ulong value, StringView format)
+        {
             Numeric.FormatUInt64(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (float value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(float value, StringView format)
+        {
             Numeric.FormatSingle(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (double value, StringView format) {
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(double value, StringView format)
+        {
             Numeric.FormatDouble(this, value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
-        public void Append (decimal value, StringView format) {
-            Numeric.FormatDecimal(this, (uint*)&value, format, culture);
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
+        public void Append(decimal value, StringView format)
+        {
+            Numeric.FormatDecimal(this, (uint*) &value, format, culture);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
         public void Append(DateTime value, StringView format)
         {
             Date.Format(this, value, format);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
         public void Append(TimeSpan value, StringView format)
         {
             Date.Format(this, value, format);
         }
 
         /// <summary>
-        /// Appends the specified value as a string to the current buffer.
+        ///     Appends the specified value as a string to the current buffer.
         /// </summary>
         /// <param name="value">The value to append.</param>
-        /// <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        /// <param name="format">A format specifier indicating how to convert <paramref name="value" /> to a string.</param>
         public void Append(Guid value, StringView format)
         {
             GuidFormatting.Format(this, value, format);
         }
 
         /// <summary>
-        /// Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
-        /// Each format item is replaced by the string representation of a single argument.
+        ///     Appends the string returned by processing a composite format string, which contains zero or more format items, to
+        ///     this instance.
+        ///     Each format item is replaced by the string representation of a single argument.
         /// </summary>
         /// <typeparam name="T">The type of argument set being formatted.</typeparam>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The set of args to insert into the format string.</param>
-        public void AppendArgSet<T>(string format, ref T args) where T : IArgSet {
+        public void AppendArgSet<T>(string format, ref T args) where T : IArgSet
+        {
             if (format == null)
                 throw new ArgumentNullException(nameof(format));
-
 
             fixed (char* formatPtr = format)
             {
@@ -514,35 +549,40 @@ namespace System.Text.Formatting {
                 var end = curr + format.Length;
                 var segmentsLeft = false;
                 var prevArgIndex = 0;
-                do {
-                    EnsureCapcity((int)(end - curr));
+                do
+                {
+                    EnsureCapcity((int) (end - curr));
                     fixed (char* bufferPtr = &buffer[currentCount])
                         segmentsLeft = AppendSegment(ref curr, end, bufferPtr, ref prevArgIndex, ref args);
-                }
-                while (segmentsLeft);
+                } while (segmentsLeft);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void EnsureCapcity(int count) {
+        void EnsureCapcity(int count)
+        {
             var desiredCapacity = currentCount + count;
             if (desiredCapacity > buffer.Length)
                 Array.Resize(ref buffer, desiredCapacity * 2);
         }
 
-        bool AppendSegment<T>(ref char* currRef, char* end, char* dest, ref int prevArgIndex, ref T args) where T : IArgSet {
-            char* curr = currRef;
-            char c = '\x0';
-            while (curr < end) {
+        bool AppendSegment<T>(ref char* currRef, char* end, char* dest, ref int prevArgIndex, ref T args) where T : IArgSet
+        {
+            var curr = currRef;
+            var c = '\x0';
+            while (curr < end)
+            {
                 c = *curr++;
-                if (c == '}') {
+                if (c == '}')
+                {
                     // check for escape character for }}
                     if (curr < end && *curr == '}')
                         curr++;
                     else
                         ThrowError();
                 }
-                else if (c == '{') {
+                else if (c == '{')
+                {
                     // check for escape character for {{
                     if (curr == end)
                         ThrowError();
@@ -572,12 +612,14 @@ namespace System.Text.Formatting {
             var width = 0;
             var leftJustify = false;
             var oldCount = currentCount;
-            if (c == ',') {
+            if (c == ',')
+            {
                 curr++;
                 c = SkipWhitespace(ref curr, end);
 
                 // spacing can be left-justified
-                if (c == '-') {
+                if (c == '-')
+                {
                     leftJustify = true;
                     curr++;
                     if (curr == end)
@@ -590,31 +632,36 @@ namespace System.Text.Formatting {
 
             // check for format specifier
             curr++;
-            if (c == ':') {
+            if (c == ':')
+            {
                 var specifierBuffer = stackalloc char[MaxSpecifierSize];
                 var specifierEnd = specifierBuffer + MaxSpecifierSize;
                 var specifierPtr = specifierBuffer;
 
-                while (true) {
+                while (true)
+                {
                     if (curr == end)
                         ThrowError();
 
                     c = *curr++;
-                    if (c == '{') {
+                    if (c == '{')
+                    {
                         // check for escape character for {{
                         if (curr < end && *curr == '{')
                             curr++;
                         else
                             ThrowError();
                     }
-                    else if (c == '}') {
+                    else if (c == '}')
+                    {
                         // check for escape character for }}
                         if (curr < end && *curr == '}')
                             curr++;
-                        else {
+                        else
+                        {
                             // found the end of the specifier
                             // kick off the format job
-                            var specifier = new StringView(specifierBuffer, (int)(specifierPtr - specifierBuffer));
+                            var specifier = new StringView(specifierBuffer, (int) (specifierPtr - specifierBuffer));
                             args.Format(this, index, specifier);
                             break;
                         }
@@ -625,7 +672,8 @@ namespace System.Text.Formatting {
                     *specifierPtr++ = c;
                 }
             }
-            else {
+            else
+            {
                 // no specifier. make sure we're at the end of the format block
                 if (c != '}')
                     ThrowError();
@@ -636,17 +684,19 @@ namespace System.Text.Formatting {
 
             // finish off padding, if necessary
             var padding = width - (currentCount - oldCount);
-            if (padding > 0) {
+            if (padding > 0)
+            {
                 if (leftJustify)
                     Append(' ', padding);
-                else {
+                else
+                {
                     // copy the recently placed chars up in memory to make room for padding
                     EnsureCapcity(padding);
-                    for (int i = currentCount - 1; i >= oldCount; i--)
+                    for (var i = currentCount - 1; i >= oldCount; i--)
                         buffer[i + padding] = buffer[i];
 
                     // fill in padding
-                    for (int i = 0; i < padding; i++)
+                    for (var i = 0; i < padding; i++)
                         buffer[i + oldCount] = ' ';
                     currentCount += padding;
                 }
@@ -658,7 +708,8 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AppendGeneric<T>(void* ptr, StringView format) {
+        internal void AppendGeneric<T>(void* ptr, StringView format)
+        {
             // ptr here is a pointer to the parameter we want to format; for
             // simple value types we can cast the pointer directly, but for
             // strings and unknown generic value types we need to pull them
@@ -667,41 +718,43 @@ namespace System.Text.Formatting {
             // this looks gross, but T is known at JIT-time so this call tree
             // gets compiled down to a direct call with no branching
             if (typeof(T) == typeof(sbyte))
-                Append(*(sbyte*)ptr, format);
+                Append(*(sbyte*) ptr, format);
             else if (typeof(T) == typeof(byte))
-                Append(*(byte*)ptr, format);
+                Append(*(byte*) ptr, format);
             else if (typeof(T) == typeof(short))
-                Append(*(short*)ptr, format);
+                Append(*(short*) ptr, format);
             else if (typeof(T) == typeof(ushort))
-                Append(*(ushort*)ptr, format);
+                Append(*(ushort*) ptr, format);
             else if (typeof(T) == typeof(int))
-                Append(*(int*)ptr, format);
+                Append(*(int*) ptr, format);
             else if (typeof(T) == typeof(uint))
-                Append(*(uint*)ptr, format);
+                Append(*(uint*) ptr, format);
             else if (typeof(T) == typeof(long))
-                Append(*(long*)ptr, format);
+                Append(*(long*) ptr, format);
             else if (typeof(T) == typeof(ulong))
-                Append(*(ulong*)ptr, format);
+                Append(*(ulong*) ptr, format);
             else if (typeof(T) == typeof(float))
-                Append(*(float*)ptr, format);
+                Append(*(float*) ptr, format);
             else if (typeof(T) == typeof(double))
-                Append(*(double*)ptr, format);
+                Append(*(double*) ptr, format);
             else if (typeof(T) == typeof(decimal))
-                Append(*(decimal*)ptr, format);
+                Append(*(decimal*) ptr, format);
             else if (typeof(T) == typeof(bool))
-                Append(*(bool*)ptr);
+                Append(*(bool*) ptr);
             else if (typeof(T) == typeof(char))
-                Append(*(char*)ptr, format);
+                Append(*(char*) ptr, format);
             else if (typeof(T) == typeof(Guid))
-                Append(*(Guid*)ptr, format);
+                Append(*(Guid*) ptr, format);
             else if (typeof(T) == typeof(DateTime))
-                Append(*(DateTime*)ptr, format);
+                Append(*(DateTime*) ptr, format);
             else if (typeof(T) == typeof(TimeSpan))
-                Append(*(TimeSpan*)ptr, format);
-            else if (typeof(T) == typeof(string)) {
+                Append(*(TimeSpan*) ptr, format);
+            else if (typeof(T) == typeof(string))
+            {
                 Append(Unsafe.Read<string>((void*) ptr));
             }
-            else {
+            else
+            {
                 // otherwise, we have an unknown type; extract it from the pointer
                 var value = Unsafe.Read<T>(ptr);
 
@@ -709,7 +762,8 @@ namespace System.Text.Formatting {
                 var formatter = ValueHelper<T>.Formatter;
                 if (formatter != null)
                     formatter(this, value, format);
-                else {
+                else
+                {
                     // Only two cases left; reference type implementing IStringFormattable,
                     // or some unknown type that doesn't implement the interface at all.
                     // We could handle the latter case by calling ToString() on it and paying the
@@ -719,19 +773,22 @@ namespace System.Text.Formatting {
                     var formattable = value as IStringFormattable;
                     if (formattable == null)
                         throw new InvalidOperationException(string.Format(SR.TypeNotFormattable, typeof(T)));
+
                     formattable.Format(this, format);
                 }
             }
         }
 
-        static int ParseNum (ref char* currRef, char* end, int maxValue) {
-            char* curr = currRef;
-            char c = *curr;
+        static int ParseNum(ref char* currRef, char* end, int maxValue)
+        {
+            var curr = currRef;
+            var c = *curr;
             if (c < '0' || c > '9')
                 ThrowError();
 
-            int value = 0;
-            do {
+            var value = 0;
+            do
+            {
                 value = value * 10 + c - '0';
                 curr++;
                 if (curr == end)
@@ -744,8 +801,9 @@ namespace System.Text.Formatting {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static char SkipWhitespace (ref char* currRef, char* end) {
-            char* curr = currRef;
+        static char SkipWhitespace(ref char* currRef, char* end)
+        {
+            var curr = currRef;
             while (curr < end && *curr == ' ') curr++;
 
             if (curr == end)
@@ -755,14 +813,18 @@ namespace System.Text.Formatting {
             return *curr;
         }
 
-        static void ThrowError () {
+        static void ThrowError()
+        {
             throw new FormatException(SR.InvalidFormatString);
         }
 
-        static StringBuffer Acquire (int capacity) {
-            if (capacity <= MaxCachedSize) {
+        static StringBuffer Acquire(int capacity)
+        {
+            if (capacity <= MaxCachedSize)
+            {
                 var buffer = CachedInstance;
-                if (buffer != null) {
+                if (buffer != null)
+                {
                     CachedInstance = null;
                     buffer.Clear();
                     buffer.EnsureCapcity(capacity);
@@ -773,19 +835,19 @@ namespace System.Text.Formatting {
             return new StringBuffer(capacity);
         }
 
-        static void Release (StringBuffer buffer) {
+        static void Release(StringBuffer buffer)
+        {
             if (buffer.buffer.Length <= MaxCachedSize)
                 CachedInstance = buffer;
         }
 
-        [ThreadStatic]
-        static StringBuffer CachedInstance;
+        [ThreadStatic] static StringBuffer CachedInstance;
 
         static readonly CachedCulture CachedInvariantCulture = new CachedCulture(CultureInfo.InvariantCulture);
         static readonly CachedCulture CachedCurrentCulture = new CachedCulture(CultureInfo.CurrentCulture);
 
         const int DefaultCapacity = 32;
-        const int MaxCachedSize = 360;  // same as BCL's StringBuilderCache
+        const int MaxCachedSize = 360; // same as BCL's StringBuilderCache
         const int MaxArgs = 256;
         const int MaxSpacing = 1000000;
         const int MaxSpecifierSize = 32;
@@ -798,10 +860,12 @@ namespace System.Text.Formatting {
         // be impossible; you'd have to cast the generic argument and introduce boxing.
         // Instead we pay a one-time startup cost to create a delegate that will forward
         // the parameter to the appropriate method in a strongly typed fashion.
-        static class ValueHelper<T> {
+        static class ValueHelper<T>
+        {
             public static Action<StringBuffer, T, StringView> Formatter = Prepare();
 
-            static Action<StringBuffer, T, StringView> Prepare () {
+            static Action<StringBuffer, T, StringView> Prepare()
+            {
                 // we only use this class for value types that also implement IStringFormattable
                 var type = typeof(T);
 #if NET451
@@ -814,15 +878,16 @@ namespace System.Text.Formatting {
                 var result = typeof(ValueHelper<T>)
 #if NET451
 #else
-                    .GetTypeInfo()
+                             .GetTypeInfo()
 #endif
-                    .GetMethod("Assign", BindingFlags.NonPublic | BindingFlags.Static)
-                    .MakeGenericMethod(type)
-                    .Invoke(null, null);
-                return (Action<StringBuffer, T, StringView>)result;
+                             .GetMethod("Assign", BindingFlags.NonPublic | BindingFlags.Static)
+                             .MakeGenericMethod(type)
+                             .Invoke(null, null);
+                return (Action<StringBuffer, T, StringView>) result;
             }
 
-            static Action<StringBuffer, U, StringView> Assign<U>() where U : IStringFormattable {
+            static Action<StringBuffer, U, StringView> Assign<U>() where U : IStringFormattable
+            {
                 return (f, u, v) => u.Format(f, v);
             }
         }
