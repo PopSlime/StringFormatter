@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using NFluent;
 using NUnit.Framework;
@@ -50,6 +51,33 @@ namespace Test
                 Check.That((int) dest[i]).IsEqualTo(0);
         }
 
-    }
+        [Test]
+        public unsafe void copy_to_span()
+        {
+            var buffer = new StringBuffer();
+            buffer.Append("some_string");
 
+            Span<char> chars = stackalloc char[100];
+            ref var r0 = ref chars.GetPinnableReference();
+
+            buffer.CopyTo(chars, 0, buffer.Count);
+#if NETCOREAPP2_1
+            Check.That(new String(chars)).IsEqualTo("some_string");
+#else
+            fixed (char* cp = &Unsafe.As<char, char>(ref r0))
+                Check.That(new String(cp, 0, chars.Length)).IsEqualTo("some_string");
+#endif
+
+            chars.Clear();
+            buffer.CopyTo(chars, 5, buffer.Count - 5);
+
+#if NETCOREAPP2_1
+            Check.That(new String(chars)).IsEqualTo("string");
+#else
+            fixed (char* cp = &Unsafe.As<char, char>(ref r0))
+                Check.That(new String(cp, 0, chars.Length)).IsEqualTo("string");
+#endif
+
+        }
+    }
 }
