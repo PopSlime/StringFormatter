@@ -2,20 +2,11 @@
   <Import Project="..\netfx.props" />
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <VersionPrefix>1.0.0.7</VersionPrefix>
+    <Version>$(StringFormatterVersion)</Version>
     <TargetFrameworks>net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>Zero-allocation string formatting for .NET (a fork of https://github.com/MikePopoloski/StringFormatter)</Description>
-    <Copyright>Copyright ©  2015 Michael Popoloski	</Copyright>
-    <Product>StringFormatter</Product>
-    <PackageProjectUrl>https://github.com/MendelMonteiro/StringFormatter</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MendelMonteiro/StringFormatter</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>string format zero-alloc</PackageTags>
     <PackageId>StringFormatter</PackageId>
-    <Authors>Michael Popoloski, Mendel Monteiro-Beckerman</Authors>
-    <PackageLicenseUrl>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</PackageLicenseUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <NetStandardImplicitPackageVersion>2.0.3</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.1" />

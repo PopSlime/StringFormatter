@@ -1,6 +1,8 @@
 ﻿namespace System.Text.Formatting {
     // TODO: clean this up
+#pragma warning disable 660,661
     public unsafe struct StringView {
+#pragma warning restore 660,661
         public static readonly StringView Empty = new StringView();
 
         public readonly char* Data;

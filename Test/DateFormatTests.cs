@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.Formatting;
+using AutoFixture;
 using NFluent;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
 
 namespace Test
 {

@@ -1,0 +1,42 @@
+<Project>
+
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants Condition="'$(TargetFramework)' == 'net471'
+                     or '$(TargetFramework)' == 'net461'">$(DefineConstants);NETFWK</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <StringFormatterVersion>1.0.0.7</StringFormatterVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>$(StringFormatterVersion)</Version>
+    <Authors>Michael Popoloski, Mendel Monteiro-Beckerman</Authors>
+    <Description>Zero-allocation string formatting for .NET (a fork of https://github.com/MikePopoloski/StringFormatter)</Description>
+    <Product>StringFormatter</Product>
+    <PackageProjectUrl>https://github.com/MendelMonteiro/StringFormatter</PackageProjectUrl>
+    <PackageLicense>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</PackageLicense>
+    <PackageTags>string format zero-alloc</PackageTags>
+    <Copyright>Copyright ©  2015 Michael Popoloski</Copyright>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">false</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild Condition="'$(APPVEYOR)' == 'True'">true</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild Condition="'$(TEAMCITY_VERSION)' != ''">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(ContinuousIntegrationBuild)">
+    <Deterministic>true</Deterministic>
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
+  </PropertyGroup>
+
+</Project>
