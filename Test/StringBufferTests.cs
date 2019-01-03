@@ -62,20 +62,20 @@ namespace Test
 
             buffer.CopyTo(chars, 0, buffer.Count);
 #if NETCOREAPP2_1
-            Check.That(new String(chars)).IsEqualTo("some_string");
+            Check.That(new string(chars.Slice(0, buffer.Count))).IsEqualTo("some_string");
 #else
             fixed (char* cp = &Unsafe.As<char, char>(ref r0))
-                Check.That(new String(cp, 0, chars.Length)).IsEqualTo("some_string");
+                Check.That(new string(cp, 0, buffer.Count)).IsEqualTo("some_string");
 #endif
 
             chars.Clear();
             buffer.CopyTo(chars, 5, buffer.Count - 5);
 
 #if NETCOREAPP2_1
-            Check.That(new String(chars)).IsEqualTo("string");
+            Check.That(new string(chars.Slice(0, buffer.Count - 5))).IsEqualTo("string");
 #else
             fixed (char* cp = &Unsafe.As<char, char>(ref r0))
-                Check.That(new String(cp, 0, chars.Length)).IsEqualTo("string");
+                Check.That(new string(cp, 0, buffer.Count - 5)).IsEqualTo("string");
 #endif
 
         }
