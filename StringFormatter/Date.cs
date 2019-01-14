@@ -2,7 +2,8 @@ namespace System.Text.Formatting
 {
     internal class Date
     {
-        private static readonly string _standardFormat = "yyyy-MM-dd";
+        const char _standardFormatShort = 'd';
+        static readonly string _standardFormat = "yyyy-MM-dd";
 
         public static unsafe void Format(StringBuffer formatter, DateTime dateTime, StringView format)
         {
@@ -39,6 +40,9 @@ namespace System.Text.Formatting
 
         private static unsafe bool IsStandardShortFormat(StringView format)
         {
+            if (format.Length == 1 && format.Data[0] == _standardFormatShort)
+                return true;
+
             if (_standardFormat.Length != format.Length)
                 return false;
 

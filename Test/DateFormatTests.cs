@@ -38,11 +38,22 @@ namespace Test
 
         [Test]
         [Repeat(50)]
-        public void should_format_multiple_with_short_date_format()
+        public void should_format_multiple_with_short_date_format_yyyy_MM_dd()
         {
             var buffer = new StringBuffer();
             var dateTime = _fixture.Create<DateTime>();
             buffer.AppendFormat("Date {0:yyyy-MM-dd}", dateTime);
+
+            Check.That(buffer.ToString()).IsEqualTo($"Date {dateTime:yyyy-MM-dd}");
+        }
+
+        [Test]
+        [Repeat(50)]
+        public void should_format_multiple_with_short_date_format_d()
+        {
+            var buffer = new StringBuffer();
+            var dateTime = _fixture.Create<DateTime>();
+            buffer.AppendFormat("Date {0:d}", dateTime);
 
             Check.That(buffer.ToString()).IsEqualTo($"Date {dateTime:yyyy-MM-dd}");
         }
