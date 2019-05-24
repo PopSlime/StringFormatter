@@ -1,0 +1,57 @@
+
+variables:
+  BuildConfiguration: Release
+
+jobs:
+  - job: Windows
+    pool:
+      vmImage: windows-2019
+    steps:
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        inputs:
+          command: build
+          projects: StringFormatter.sln
+          arguments: --configuration $(BuildConfiguration)
+
+      - task: DotNetCoreCLI@2
+        displayName: Test
+        inputs:
+          command: test
+          projects: Test/Test.csproj
+          arguments: --configuration $(BuildConfiguration)
+          testRunTitle: Windows
+
+      - task: DotNetCoreCLI@2
+        displayName: Pack
+        inputs:
+          command: pack
+          projects: StringFormatter/StringFormatter.csproj
+          configuration: $(BuildConfiguration)
+          packDirectory: $(Build.ArtifactStagingDirectory)
+          nobuild: true
+          verbosityPack: Minimal
+
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifacts
+        inputs:
+          ArtifactName: NuGet
+
+  - job: Linux
+    pool:
+      vmImage: ubuntu-16.04
+    steps:
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        inputs:
+          command: build
+          projects: StringFormatter.sln
+          arguments: --configuration $(BuildConfiguration) --framework netcoreapp2.1
+
+      - task: DotNetCoreCLI@2
+        displayName: Test
+        inputs:
+          command: test
+          projects: Test/Test.csproj
+          arguments: --configuration $(BuildConfiguration) --framework netcoreapp2.1
+          testRunTitle: Linux
