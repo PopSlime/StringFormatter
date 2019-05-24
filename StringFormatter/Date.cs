@@ -64,6 +64,8 @@ namespace System.Text.Formatting
 
         public static unsafe void Format(StringBuffer formatter, TimeSpan timeSpan, StringView format)
         {
+            IL.DeclareLocals(false);
+
             var tempCharsLength = 7;
             char* tempChars = stackalloc char[tempCharsLength];
 
