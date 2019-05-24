@@ -5,20 +5,16 @@
     <Version>$(StringFormatterVersion)</Version>
     <TargetFrameworks>net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <PackageId>StringFormatter</PackageId>
+    <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <NetStandardImplicitPackageVersion>2.0.3</NetStandardImplicitPackageVersion>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Fody" Version="4.2.1" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="1.1.2" PrivateAssets="all" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="netstandard" />
-  </ItemGroup>
+  
   <ItemGroup>
     <None Update="Arg.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

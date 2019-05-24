@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26127.3
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringFormatter", "StringFormatter\StringFormatter.csproj", "{8A0EF787-605F-44BA-AE5C-D616451F8724}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringFormatter", "StringFormatter\StringFormatter.csproj", "{8A0EF787-605F-44BA-AE5C-D616451F8724}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{FF8CF9EA-5869-414E-9084-F81B037B38F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{FF8CF9EA-5869-414E-9084-F81B037B38F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringFormatterBench", "StringFormatterBench\StringFormatterBench.csproj", "{51C5A6EA-8887-4E20-951E-039728975CAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringFormatterBench", "StringFormatterBench\StringFormatterBench.csproj", "{51C5A6EA-8887-4E20-951E-039728975CAC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B26CCB24-735B-4E7C-A02B-9FFB189D50BB}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
+		netfx.props = netfx.props
 		README.md = README.md
 		SharedVersionInfo.cs = SharedVersionInfo.cs
 		version.yml = version.yml
@@ -38,5 +40,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {28404200-3EC2-4E2F-A852-15E51AFEDA06}
 	EndGlobalSection
 EndGlobal

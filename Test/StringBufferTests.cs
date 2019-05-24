@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using NFluent;
 using NUnit.Framework;
+using Unsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace Test
 {
