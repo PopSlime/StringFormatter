@@ -1,2 +1,5 @@
-powershell build\build.ps1 -Script build\build.cake -Target Build
+@echo off
+pushd "%~dp0"
+dotnet build StringFormatter.sln --configuration Release
+popd
 pause

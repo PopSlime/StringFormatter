@@ -1,2 +1,5 @@
-powershell build\build.ps1 -Script build\build.cake -Target Nuget
+@echo off
+pushd "%~dp0"
+dotnet pack StringFormatter.sln --configuration Release --output "%~dp0\output"
+popd
 pause
