@@ -1,6 +1,9 @@
 StringFormatter
 ===============
 
+[![Build Status](https://mendelmonteiro.visualstudio.com/StringFormatter/_apis/build/status/StringFormatter?branchName=master)](https://mendelmonteiro.visualstudio.com/StringFormatter/_build/latest?definitionId=1&branchName=master)
+[![NuGet](https://img.shields.io/nuget/v/StringFormatter.svg?label=NuGet&logo=NuGet)](http://www.nuget.org/packages/StringFormatter/)
+
 A zero-allocation* string formatting library for .NET applications.
 
 Motivation
