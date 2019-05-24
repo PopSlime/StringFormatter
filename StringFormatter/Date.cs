@@ -1,3 +1,5 @@
+using InlineIL;
+
 namespace System.Text.Formatting
 {
     internal class Date
@@ -7,6 +9,8 @@ namespace System.Text.Formatting
 
         public static unsafe void Format(StringBuffer formatter, DateTime dateTime, StringView format)
         {
+            IL.DeclareLocals(false);
+
             var tempCharsLength = 4;
             char* tempChars = stackalloc char[tempCharsLength];
 

@@ -8,11 +8,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
     <DebugType>embedded</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <DefineConstants Condition="'$(TargetFramework)' == 'net471'
-                     or '$(TargetFramework)' == 'net461'">$(DefineConstants);NETFWK</DefineConstants>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,14 +25,6 @@
     <PackageTags>string format zero-alloc</PackageTags>
     <Copyright>Copyright ©  2015 Michael Popoloski</Copyright>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">false</ContinuousIntegrationBuild>
-    <ContinuousIntegrationBuild Condition="'$(APPVEYOR)' == 'True'">true</ContinuousIntegrationBuild>
-    <ContinuousIntegrationBuild Condition="'$(TEAMCITY_VERSION)' != ''">true</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="$(ContinuousIntegrationBuild)">
-    <Deterministic>true</Deterministic>
-    <DeterministicSourcePaths>true</DeterministicSourcePaths>
   </PropertyGroup>
 
 </Project>

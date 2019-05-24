@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using InlineIL;
 
 namespace System.Text.Formatting {
     // Most of the implementation of this file was ported from the native versions built into the CLR
@@ -36,6 +37,8 @@ namespace System.Text.Formatting {
         }
 
         public static void FormatInt32 (StringBuffer formatter, int value, StringView specifier, CachedCulture culture) {
+            IL.DeclareLocals(false);
+
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -71,6 +74,8 @@ namespace System.Text.Formatting {
         }
 
         public static void FormatUInt32 (StringBuffer formatter, uint value, StringView specifier, CachedCulture culture) {
+            IL.DeclareLocals(false);
+
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -106,6 +111,8 @@ namespace System.Text.Formatting {
         }
 
         public static void FormatInt64 (StringBuffer formatter, long value, StringView specifier, CachedCulture culture) {
+            IL.DeclareLocals(false);
+
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -141,6 +148,8 @@ namespace System.Text.Formatting {
         }
 
         public static void FormatUInt64 (StringBuffer formatter, ulong value, StringView specifier, CachedCulture culture) {
+            IL.DeclareLocals(false);
+
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -176,6 +185,8 @@ namespace System.Text.Formatting {
         }
 
         public static void FormatSingle (StringBuffer formatter, float value, StringView specifier, CachedCulture culture) {
+            IL.DeclareLocals(false);
+
             int digits;
             int precision = FloatPrecision;
             var fmt = ParseFormatSpecifier(specifier, out digits);
@@ -219,6 +230,8 @@ namespace System.Text.Formatting {
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void FormatDouble (StringBuffer formatter, double value, StringView specifier, CachedCulture culture) {
+            IL.DeclareLocals(false);
+
             int digits;
             int precision = DoublePrecision;
             var fmt = ParseFormatSpecifier(specifier, out digits);
@@ -262,6 +275,8 @@ namespace System.Text.Formatting {
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void FormatDecimal (StringBuffer formatter, uint* value, StringView specifier, CachedCulture culture) {
+            IL.DeclareLocals(false);
+
             int digits;
             var fmt = ParseFormatSpecifier(specifier, out digits);
 
@@ -276,6 +291,8 @@ namespace System.Text.Formatting {
         }
 
         static void NumberToString (StringBuffer formatter, ref Number number, char format, int maxDigits, CachedCulture culture, bool isDecimal = false) {
+            IL.DeclareLocals(false);
+
             // ANDing with 0xFFDF has the effect of uppercasing the character
             switch (format & 0xFFDF) {
                 case 'C':
@@ -527,6 +544,8 @@ namespace System.Text.Formatting {
         }
 
         static char* FormatExponent (char* buffer, int value, char expChar, string positiveSign, string negativeSign, int minDigits) {
+            IL.DeclareLocals(false);
+
             *buffer++ = expChar;
             if (value < 0) {
                 AppendString(&buffer, negativeSign);
@@ -633,6 +652,8 @@ namespace System.Text.Formatting {
         }
 
         static void Int32ToDecStr (StringBuffer formatter, int value, int digits, string negativeSign) {
+            IL.DeclareLocals(false);
+
             if (digits < 1)
                 digits = 1;
 
@@ -658,6 +679,8 @@ namespace System.Text.Formatting {
         }
 
         static void UInt32ToDecStr (StringBuffer formatter, uint value, int digits) {
+            IL.DeclareLocals(false);
+
             var buffer = stackalloc char[100];
             if (digits < 1)
                 digits = 1;
@@ -667,6 +690,8 @@ namespace System.Text.Formatting {
         }
 
         static void Int32ToHexStr (StringBuffer formatter, uint value, int hexBase, int digits) {
+            IL.DeclareLocals(false);
+
             var buffer = stackalloc char[100];
             if (digits < 1)
                 digits = 1;
@@ -676,6 +701,8 @@ namespace System.Text.Formatting {
         }
 
         static void Int64ToDecStr (StringBuffer formatter, long value, int digits, string negativeSign) {
+            IL.DeclareLocals(false);
+
             if (digits < 1)
                 digits = 1;
 
@@ -709,6 +736,8 @@ namespace System.Text.Formatting {
         }
 
         static void UInt64ToDecStr (StringBuffer formatter, ulong value, int digits) {
+            IL.DeclareLocals(false);
+
             if (digits < 1)
                 digits = 1;
 
@@ -724,6 +753,8 @@ namespace System.Text.Formatting {
         }
 
         static void Int64ToHexStr (StringBuffer formatter, ulong value, int hexBase, int digits) {
+            IL.DeclareLocals(false);
+
             var buffer = stackalloc char[100];
             char* ptr;
             if (High32(value) != 0) {
@@ -760,7 +791,7 @@ namespace System.Text.Formatting {
             return p;
         }
 
-        static char ParseFormatSpecifier (StringView specifier, out int digits) {
+        internal static char ParseFormatSpecifier (StringView specifier, out int digits) {
             if (specifier.IsEmpty) {
                 digits = -1;
                 return 'G';
@@ -769,20 +800,29 @@ namespace System.Text.Formatting {
             char* curr = specifier.Data;
             char first = *curr++;
             if ((first >= 'A' && first <= 'Z') || (first >= 'a' && first <= 'z')) {
-                int n = -1;
-                char c = *curr++;
-                if (c >= '0' && c <= '9') {
-                    n = c - '0';
-                    c = *curr++;
-                    while (c >= '0' && c <= '9') {
+                if (specifier.Length == 1) {
+                    digits = -1;
+                    return first;
+                }
+
+                var n = 0;
+                var end = specifier.Data + specifier.Length;
+
+                while (curr != end) {
+                    var c = *curr++;
+
+                    if (c >= '0' && c <= '9') {
                         n = n * 10 + c - '0';
-                        c = *curr++;
                         if (n >= 10)
                             break;
                     }
+                    else {
+                        digits = -1;
+                        return (char)0;
+                    }
                 }
 
-                if (c == 0) {
+                if (curr == end) {
                     digits = n;
                     return first;
                 }
@@ -793,6 +833,8 @@ namespace System.Text.Formatting {
         }
 
         static void Int32ToNumber (int value, ref Number number) {
+            IL.DeclareLocals(false);
+
             number.Precision = Int32Precision;
             if (value >= 0)
                 number.Sign = 0;
@@ -813,6 +855,8 @@ namespace System.Text.Formatting {
         }
 
         static void UInt32ToNumber (uint value, ref Number number) {
+            IL.DeclareLocals(false);
+
             number.Precision = UInt32Precision;
             number.Sign = 0;
 
@@ -828,6 +872,8 @@ namespace System.Text.Formatting {
         }
 
         static void Int64ToNumber (long value, ref Number number) {
+            IL.DeclareLocals(false);
+
             number.Precision = Int64Precision;
             if (value >= 0)
                 number.Sign = 0;
@@ -853,6 +899,8 @@ namespace System.Text.Formatting {
         }
 
         static void UInt64ToNumber (ulong value, ref Number number) {
+            IL.DeclareLocals(false);
+
             number.Precision = UInt64Precision;
             number.Sign = 0;
 
@@ -944,6 +992,8 @@ namespace System.Text.Formatting {
         }
 
         static void DecimalToNumber (uint* value, ref Number number) {
+            IL.DeclareLocals(false);
+
             // bit 31 of the decimal is the sign bit
             // bits 16-23 contain the scale
             number.Sign = (int)(*value >> 31);
