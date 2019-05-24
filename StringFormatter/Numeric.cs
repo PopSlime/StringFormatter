@@ -791,7 +791,7 @@ namespace System.Text.Formatting {
             return p;
         }
 
-        static char ParseFormatSpecifier (StringView specifier, out int digits) {
+        internal static char ParseFormatSpecifier (StringView specifier, out int digits) {
             if (specifier.IsEmpty) {
                 digits = -1;
                 return 'G';
@@ -800,20 +800,29 @@ namespace System.Text.Formatting {
             char* curr = specifier.Data;
             char first = *curr++;
             if ((first >= 'A' && first <= 'Z') || (first >= 'a' && first <= 'z')) {
-                int n = -1;
-                char c = *curr++;
-                if (c >= '0' && c <= '9') {
-                    n = c - '0';
-                    c = *curr++;
-                    while (c >= '0' && c <= '9') {
+                if (specifier.Length == 1) {
+                    digits = -1;
+                    return first;
+                }
+
+                var n = 0;
+                var end = specifier.Data + specifier.Length;
+
+                while (curr != end) {
+                    var c = *curr++;
+
+                    if (c >= '0' && c <= '9') {
                         n = n * 10 + c - '0';
-                        c = *curr++;
                         if (n >= 10)
                             break;
                     }
+                    else {
+                        digits = -1;
+                        return (char)0;
+                    }
                 }
 
-                if (c == 0) {
+                if (curr == end) {
                     digits = n;
                     return first;
                 }

@@ -88,5 +88,26 @@ namespace Test
             buffer.AppendFormat($"{{0:{format}}}", floating);
             Check.That(buffer.ToString()).IsEqualTo(floating.ToString(format));
         }
+
+        [Test]
+        [TestCase("4", '\x0', -1)]
+        [TestCase("42", '\x0', -1)]
+        [TestCase("E", 'E', -1)]
+        [TestCase("E0", 'E', 0)]
+        [TestCase("E000", 'E', 0)]
+        [TestCase("E1", 'E', 1)]
+        [TestCase("E001", 'E', 1)]
+        [TestCase("EE", '\x0', -1)]
+        [TestCase("E42", 'E', 42)]
+        [TestCase("E422", '\x0', -1)]
+        public unsafe void ShouldParseFormatSpecifier(string specifier, char expectedFormat, int expectedDigits)
+        {
+            fixed (char* specifierPtr = specifier)
+            {
+                var format = Numeric.ParseFormatSpecifier(new StringView(specifierPtr, specifier.Length), out var digits);
+                Check.That(format).IsEqualTo(expectedFormat);
+                Check.That(digits).IsEqualTo(expectedDigits);
+            }
+        }
     }
 }
