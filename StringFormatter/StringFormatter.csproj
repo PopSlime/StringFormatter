@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\netfx.props" />
   <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <Version>$(StringFormatterVersion)</Version>
     <TargetFrameworks>net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
-    <PackageId>StringFormatter</PackageId>
     <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>StringFormatter</PackageId>
   </PropertyGroup>
   
   <ItemGroup>
@@ -31,4 +27,5 @@
       <DependentUpon>Arg.tt</DependentUpon>
     </Compile>
   </ItemGroup>
+
 </Project>

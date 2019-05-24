@@ -1,17 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\netfx.props" />
   <PropertyGroup>
+    <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
     <OutputType>exe</OutputType>
     <OutputTypeEx>exe</OutputTypeEx>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StringFormatter\StringFormatter.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.11.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\StringFormatter\StringFormatter.csproj" />
-  </ItemGroup>
 </Project>

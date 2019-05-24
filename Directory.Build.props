@@ -1,4 +1,5 @@
 <Project>
+  <Import Project="netfx.props" />
 
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -12,18 +13,17 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <StringFormatterVersion>1.0.0.12</StringFormatterVersion>
+    <Version>1.0.0.12</Version>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>$(StringFormatterVersion)</Version>
     <Authors>Michael Popoloski, Mendel Monteiro-Beckerman</Authors>
     <Description>Zero-allocation string formatting for .NET (a fork of https://github.com/MikePopoloski/StringFormatter)</Description>
     <Product>StringFormatter</Product>
     <PackageProjectUrl>https://github.com/MendelMonteiro/StringFormatter</PackageProjectUrl>
-    <PackageLicense>https://github.com/MendelMonteiro/StringFormatter/blob/master/LICENSE</PackageLicense>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>string format zero-alloc</PackageTags>
-    <Copyright>Copyright ©  2015 Michael Popoloski</Copyright>
+    <Copyright>Copyright © 2015 Michael Popoloski</Copyright>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
