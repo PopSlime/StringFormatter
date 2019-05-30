@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text.Formatting;
 using AutoFixture;
 using NFluent;
@@ -64,7 +65,7 @@ namespace Test
             var buffer = new StringBuffer();
             buffer.AppendFormat("Timespan {0}", new TimeSpan(11, 01, 55));
 
-            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55.0000000");
+            Check.That(buffer.ToString()).IsEqualTo("Timespan 11:01:55");
         }
 
         [Test]
@@ -76,7 +77,6 @@ namespace Test
             Check.That(buffer.ToString()).IsEqualTo("Timespan 666.11:01:55.3330000");
         }
 
-
         [Test]
         [Repeat(50)]
         public void should_format_many_with_standard_timespan_format()
@@ -86,7 +86,7 @@ namespace Test
             var timeSpan = TimeSpan.FromSeconds(_fixture.Create<int>());
             buffer.AppendFormat("Timespan {0}", timeSpan);
 
-            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss\.fffffff")}");
+            Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan:c}");
         }
 
         [Test]
@@ -97,7 +97,30 @@ namespace Test
             var buffer = new StringBuffer();
             buffer.Append(timeSpan, StringView.Empty);
 
-            Check.That(buffer.ToString()).IsEqualTo("-00:01:02.0000000");
+            Check.That(buffer.ToString()).IsEqualTo("-00:01:02");
+        }
+
+        [Test]
+        public unsafe void should_handle_standard_timespan_formats(
+            [Values("01:02:03", "01:02:03.04", "01:02:03:04", "01:02:03:04.05")] string timeSpanString,
+            [Values(false, true)] bool negative,
+            [Values("c", "g", "G")] string format
+        )
+        {
+            var timeSpan = TimeSpan.Parse(timeSpanString, CultureInfo.InvariantCulture);
+
+            if (negative)
+                timeSpan = new TimeSpan(-timeSpan.Ticks);
+
+            var expectedString = timeSpan.ToString(format, CultureInfo.InvariantCulture);
+
+            fixed (char* formatPtr = format)
+            {
+                var buffer = new StringBuffer();
+                buffer.Append(timeSpan, new StringView(formatPtr, format.Length));
+
+                Check.That(buffer.ToString()).IsEqualTo(expectedString);
+            }
         }
     }
 }

@@ -817,6 +817,12 @@ namespace System.Text.Formatting
             return *curr;
         }
 
+        public void TrimEnd(char c)
+        {
+            while (currentCount != 0 && buffer[currentCount - 1] == c)
+                --currentCount;
+        }
+
         static void ThrowError()
         {
             throw new FormatException(SR.InvalidFormatString);
