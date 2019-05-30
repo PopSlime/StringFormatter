@@ -66,15 +66,22 @@ namespace System.Text.Formatting
         {
             IL.DeclareLocals(false);
 
-            var tempCharsLength = 7;
-            char* tempChars = stackalloc char[tempCharsLength];
+            const int tempCharsLength = 7;
+            var tempChars = stackalloc char[tempCharsLength];
+
+            if (timeSpan.Ticks < 0)
+            {
+                formatter.Append('-');
+                timeSpan = new TimeSpan(-timeSpan.Ticks);
+            }
 
             var (days, hours, minutes, seconds, ticks) = timeSpan;
 
             if (days > 0) {
-                formatter.Append(days, format);
+                formatter.Append(days, StringView.Empty);
                 formatter.Append('.');
             }
+
             AppendNumber(formatter, hours, 2, tempChars, tempCharsLength);
             formatter.Append(':');
             AppendNumber(formatter, minutes, 2, tempChars, tempCharsLength);
@@ -88,9 +95,7 @@ namespace System.Text.Formatting
         {
             var startOffset = tempCharsLength - maxLength;
             for (var i = startOffset; i < tempCharsLength; i++)
-            {
-                *(tempChars + i) = '0';
-            }
+                tempChars[i] = '0';
 
             Numeric.Int32ToDecChars(tempChars + tempCharsLength, (uint)value, 0);
             formatter.Append(tempChars + startOffset, maxLength);

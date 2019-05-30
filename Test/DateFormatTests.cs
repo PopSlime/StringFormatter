@@ -88,5 +88,16 @@ namespace Test
 
             Check.That(buffer.ToString()).IsEqualTo($"Timespan {timeSpan.ToString(@"hh\:mm\:ss\.fffffff")}");
         }
+
+        [Test]
+        public void should_format_negative_timespan()
+        {
+            var timeSpan = TimeSpan.FromSeconds(-62);
+
+            var buffer = new StringBuffer();
+            buffer.Append(timeSpan, StringView.Empty);
+
+            Check.That(buffer.ToString()).IsEqualTo("-00:01:02.0000000");
+        }
     }
 }
