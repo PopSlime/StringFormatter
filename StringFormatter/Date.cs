@@ -18,6 +18,7 @@ namespace System.Text.Formatting
             if (IsStandardShortDateFormat(format))
             {
                 var (year, month, day) = dateTime;
+
                 AppendNumber(formatter, year, 4, tempChars, tempCharsLength);
                 formatter.Append('-');
                 AppendNumber(formatter, month, 2, tempChars, tempCharsLength);
@@ -26,7 +27,8 @@ namespace System.Text.Formatting
             }
             else
             {
-                var(year, month, day, hour, minute, second, millisecond) = dateTime;
+                var (year, month, day, hour, minute, second, millisecond) = dateTime;
+
                 AppendNumber(formatter, year, 4, tempChars, tempCharsLength);
                 formatter.Append('-');
                 AppendNumber(formatter, month, 2, tempChars, tempCharsLength);
@@ -59,8 +61,6 @@ namespace System.Text.Formatting
             const int tempCharsLength = 7;
             var tempChars = stackalloc char[tempCharsLength];
 
-            var fmt = ParseTimeSpanFormat(format);
-
             if (timeSpan.Ticks < 0)
             {
                 formatter.Append('-');
@@ -69,29 +69,62 @@ namespace System.Text.Formatting
 
             var (days, hours, minutes, seconds, ticks) = timeSpan;
 
-            if (days > 0 || fmt == TimeSpanFormat.GeneralLong)
+            switch (ParseTimeSpanFormat(format))
             {
-                formatter.Append(days, StringView.Empty);
-                formatter.Append(fmt == TimeSpanFormat.Constant ? '.' : ':');
-            }
+                case TimeSpanFormat.Constant:
+                    if (days > 0)
+                    {
+                        formatter.Append(days, StringView.Empty);
+                        formatter.Append('.');
+                    }
 
-            if (fmt == TimeSpanFormat.GeneralShort)
-                formatter.Append(hours, StringView.Empty);
-            else
-                AppendNumber(formatter, hours, 2, tempChars, tempCharsLength);
+                    AppendNumber(formatter, hours, 2, tempChars, tempCharsLength);
+                    formatter.Append(':');
+                    AppendNumber(formatter, minutes, 2, tempChars, tempCharsLength);
+                    formatter.Append(':');
+                    AppendNumber(formatter, seconds, 2, tempChars, tempCharsLength);
 
-            formatter.Append(':');
-            AppendNumber(formatter, minutes, 2, tempChars, tempCharsLength);
-            formatter.Append(':');
-            AppendNumber(formatter, seconds, 2, tempChars, tempCharsLength);
+                    if (ticks != 0)
+                    {
+                        formatter.Append('.');
+                        AppendNumber(formatter, ticks, 7, tempChars, tempCharsLength);
+                    }
+                    break;
 
-            if (ticks != 0 || fmt == TimeSpanFormat.GeneralLong)
-            {
-                formatter.Append('.');
-                AppendNumber(formatter, ticks, 7, tempChars, tempCharsLength);
+                case TimeSpanFormat.GeneralShort:
+                    if (days > 0)
+                    {
+                        formatter.Append(days, StringView.Empty);
+                        formatter.Append(':');
+                    }
 
-                if (fmt == TimeSpanFormat.GeneralShort)
-                    formatter.TrimEnd('0');
+                    formatter.Append(hours, StringView.Empty);
+                    formatter.Append(':');
+                    AppendNumber(formatter, minutes, 2, tempChars, tempCharsLength);
+                    formatter.Append(':');
+                    AppendNumber(formatter, seconds, 2, tempChars, tempCharsLength);
+
+                    if (ticks != 0)
+                    {
+                        formatter.Append('.');
+                        AppendNumber(formatter, ticks, 7, tempChars, tempCharsLength);
+                        formatter.TrimEnd('0');
+                    }
+                    break;
+
+                case TimeSpanFormat.GeneralLong:
+                    formatter.Append(days, StringView.Empty);
+                    formatter.Append(':');
+
+                    AppendNumber(formatter, hours, 2, tempChars, tempCharsLength);
+                    formatter.Append(':');
+                    AppendNumber(formatter, minutes, 2, tempChars, tempCharsLength);
+                    formatter.Append(':');
+                    AppendNumber(formatter, seconds, 2, tempChars, tempCharsLength);
+
+                    formatter.Append('.');
+                    AppendNumber(formatter, ticks, 7, tempChars, tempCharsLength);
+                    break;
             }
         }
 
@@ -105,6 +138,7 @@ namespace System.Text.Formatting
             formatter.Append(tempChars + startOffset, maxLength);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe TimeSpanFormat ParseTimeSpanFormat(StringView format)
         {
             if (format.Length != 1)
