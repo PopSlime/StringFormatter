@@ -248,7 +248,7 @@ namespace System.Text.Formatting
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(char c)
         {
-            EnsureCapcity(1);
+            EnsureCapacity(1);
             buffer[currentCount++] = c;
         }
 
@@ -262,7 +262,7 @@ namespace System.Text.Formatting
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
 
-            EnsureCapcity(count);
+            EnsureCapacity(count);
             fixed (char* b = &buffer[currentCount])
             {
                 var ptr = b;
@@ -284,7 +284,7 @@ namespace System.Text.Formatting
                 throw new ArgumentOutOfRangeException(nameof(length));
 
             var count = length * 2;
-            EnsureCapcity(count);
+            EnsureCapacity(count);
 
             var charCount = encoding.GetChars(bytes, 0, length, buffer, currentCount);
             currentCount += charCount;
@@ -297,7 +297,7 @@ namespace System.Text.Formatting
         public void Append(AsciiString asciiString)
         {
             var length = asciiString.Length;
-            EnsureCapcity(length);
+            EnsureCapacity(length);
 
             fixed (char* buf = &buffer[currentCount])
             {
@@ -359,7 +359,7 @@ namespace System.Text.Formatting
         /// <param name="count">The number of characters to append.</param>
         public void Append(char* str, int count)
         {
-            EnsureCapcity(count);
+            EnsureCapacity(count);
             fixed (char* b = &buffer[currentCount])
             {
                 var dest = b;
@@ -375,7 +375,7 @@ namespace System.Text.Formatting
         /// <param name="str">The <see cref="ReadOnlySpan{char}" /> to append.</param>
         public void Append(ReadOnlySpan<char> str)
         {
-            EnsureCapcity(str.Length);
+            EnsureCapacity(str.Length);
             str.CopyTo(new Span<char>(buffer, currentCount, str.Length));
             currentCount += str.Length;
         }
@@ -555,7 +555,7 @@ namespace System.Text.Formatting
                 var prevArgIndex = 0;
                 do
                 {
-                    EnsureCapcity((int) (end - curr));
+                    EnsureCapacity((int) (end - curr));
                     fixed (char* bufferPtr = &buffer[currentCount])
                         segmentsLeft = AppendSegment(ref curr, end, bufferPtr, ref prevArgIndex, ref args);
                 } while (segmentsLeft);
@@ -563,7 +563,7 @@ namespace System.Text.Formatting
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void EnsureCapcity(int count)
+        internal void EnsureCapacity(int count)
         {
             var desiredCapacity = currentCount + count;
             if (desiredCapacity > buffer.Length)
@@ -697,7 +697,7 @@ namespace System.Text.Formatting
                 else
                 {
                     // copy the recently placed chars up in memory to make room for padding
-                    EnsureCapcity(padding);
+                    EnsureCapacity(padding);
                     for (var i = currentCount - 1; i >= oldCount; i--)
                         buffer[i + padding] = buffer[i];
 
@@ -839,7 +839,7 @@ namespace System.Text.Formatting
                 {
                     CachedInstance = null;
                     buffer.Clear();
-                    buffer.EnsureCapcity(capacity);
+                    buffer.EnsureCapacity(capacity);
                     return buffer;
                 }
             }

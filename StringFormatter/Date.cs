@@ -19,6 +19,8 @@ namespace System.Text.Formatting
             {
                 var (year, month, day) = dateTime;
 
+                formatter.EnsureCapacity(10);
+
                 AppendNumber(formatter, year, 4, tempChars, tempCharsLength);
                 formatter.Append('-');
                 AppendNumber(formatter, month, 2, tempChars, tempCharsLength);
@@ -28,6 +30,8 @@ namespace System.Text.Formatting
             else
             {
                 var (year, month, day, hour, minute, second, millisecond) = dateTime;
+
+                formatter.EnsureCapacity(23);
 
                 AppendNumber(formatter, year, 4, tempChars, tempCharsLength);
                 formatter.Append('-');
@@ -60,6 +64,8 @@ namespace System.Text.Formatting
 
             const int tempCharsLength = 7;
             var tempChars = stackalloc char[tempCharsLength];
+
+            formatter.EnsureCapacity(20);
 
             if (timeSpan.Ticks < 0)
             {
