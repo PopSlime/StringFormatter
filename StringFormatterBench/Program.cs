@@ -22,17 +22,15 @@ namespace StringFormatterBench
     }
 
     [Config(typeof(Config))]
-    public unsafe class StringFormatBenchmark {
+    public class StringFormatBenchmark {
         StringBuilder _sb1;
         StringBuffer _sb2;
-        char* _dest;
         static readonly string formatTest = "Foo {0,13:e12} and bar!! {1,-15:P}bah";
         const double v1 = 13.934939;
         const double v2 = 0;
 
         [GlobalSetup]
         public void Setup() {
-            _dest = (char*) Marshal.AllocHGlobal(128);
             _sb1 = new StringBuilder();
             _sb2 = new StringBuffer();
         }
@@ -50,6 +48,29 @@ namespace StringFormatterBench
             _sb2.AppendFormat(formatTest, v1, v2);
             var s = _sb2.ToString();
             _sb2.Clear();
+            return s;
+        }
+    }
+
+    [Config(typeof(Config))]
+    public class TimeSpanAppendBenchmark {
+        StringBuffer _stringBuffer;
+        private static readonly TimeSpan _timeSpan = new TimeSpan(1, 2, 3, 4, 5);
+
+        [GlobalSetup]
+        public void Setup() {
+            _stringBuffer = new StringBuffer();
+        }
+
+        [Benchmark(Baseline = true)]
+        public string Baseline()
+            => _timeSpan.ToString();
+
+        [Benchmark]
+        public string StringBuffer() {
+            _stringBuffer.Append(_timeSpan, StringView.Empty);
+            var s = _stringBuffer.ToString();
+            _stringBuffer.Clear();
             return s;
         }
     }
@@ -119,5 +140,15 @@ namespace StringFormatterBench
 
     class Program {
         static void Main(string[] args)
-            => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);    }
+        {
+            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+
+            while (Console.KeyAvailable)
+                Console.ReadKey(true);
+
+            Console.WriteLine();
+            Console.WriteLine("Press any key to exit");
+            Console.ReadKey(true);
+        }
+    }
 }
