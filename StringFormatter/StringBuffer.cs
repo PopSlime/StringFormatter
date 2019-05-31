@@ -245,9 +245,11 @@ namespace System.Text.Formatting
         ///     Appends a character to the current buffer.
         /// </summary>
         /// <param name="c">The character to append.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(char c)
         {
-            Append(c, 1);
+            EnsureCapcity(1);
+            buffer[currentCount++] = c;
         }
 
         /// <summary>
