@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using InlineIL;
 
 namespace System.Text.Formatting
 {
@@ -7,8 +6,6 @@ namespace System.Text.Formatting
     {
         public static unsafe void Format(StringBuffer formatter, Guid value, StringView format)
         {
-            IL.DeclareLocals(false);
-
             if (format.Length > 1)
                 throw new FormatException(string.Format(SR.UnknownFormatSpecifier, format));
 

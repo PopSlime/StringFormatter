@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using InlineIL;
 
 namespace System.Text.Formatting
 {
@@ -10,8 +9,6 @@ namespace System.Text.Formatting
 
         public static unsafe void Format(StringBuffer formatter, DateTime dateTime, StringView format)
         {
-            IL.DeclareLocals(false);
-
             const int tempCharsLength = 4;
             var tempChars = stackalloc char[tempCharsLength];
 
@@ -60,8 +57,6 @@ namespace System.Text.Formatting
 
         public static unsafe void Format(StringBuffer formatter, TimeSpan timeSpan, StringView format)
         {
-            IL.DeclareLocals(false);
-
             const int tempCharsLength = 7;
             var tempChars = stackalloc char[tempCharsLength];
 

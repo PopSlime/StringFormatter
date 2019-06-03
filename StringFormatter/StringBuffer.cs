@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using InlineIL;
 
 namespace System.Text.Formatting
 {
@@ -572,8 +571,6 @@ namespace System.Text.Formatting
 
         bool AppendSegment<T>(ref char* currRef, char* end, char* dest, ref int prevArgIndex, ref T args) where T : IArgSet
         {
-            IL.DeclareLocals(false);
-
             var curr = currRef;
             var c = '\x0';
             while (curr < end)
