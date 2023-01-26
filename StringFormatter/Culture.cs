@@ -22,6 +22,7 @@ namespace System.Text.Formatting {
         public readonly string PercentNegativePattern;
         public readonly string PercentPositivePattern;
         public readonly string PercentSymbol;
+        public readonly string PerMilleSymbol;
 
         public readonly string NegativeSign;
         public readonly string PositiveSign;
@@ -89,6 +90,7 @@ namespace System.Text.Formatting {
             PercentNegativePattern = NegativePercentFormats[info.PercentNegativePattern];
             PercentPositivePattern = PositivePercentFormats[info.PercentPositivePattern];
             PercentSymbol = info.PercentSymbol;
+            PerMilleSymbol = info.PerMilleSymbol;
             NegativeSign = info.NegativeSign;
             PositiveSign = info.PositiveSign;
             NaN = info.NaNSymbol;
