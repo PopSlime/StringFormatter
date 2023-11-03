@@ -1,48 +1,48 @@
 namespace System.Text.Formatting {
 	// this file contains the custom numeric formatting routines split out from the Numeric.cs file
 	unsafe partial class Numeric {
-        static void NumberToCustomFormatString(StringBuffer formatter, ref Number number, StringView specifier, CachedCulture culture) {
-            // Special: Handle special values
-            switch (number.Scale) {
-                case ScaleInf: formatter.Append(number.Sign == 0 ? culture.PositiveInfinity : culture.NegativeInfinity); return;
-                case ScaleNaN: formatter.Append(culture.NaN); return;
-            }
-            // Iteration 1: Split by semicolon
-            int specifierPositiveEnd = IndexOfSectionSeparator(specifier);
-            int specifierNegativeStart = 0, specifierNegativeEnd, specifierZeroStart = 0, specifierZeroEnd;
-            if (specifierPositiveEnd == -1) {
-                specifierPositiveEnd = specifierNegativeEnd = specifierZeroEnd = specifier.Length;
-            }
-            else {
-                specifierNegativeStart = specifierPositiveEnd + 1;
-                specifierNegativeEnd = IndexOfSectionSeparator(specifier, specifierNegativeStart);
-                if (specifierNegativeEnd == -1) {
-                    specifierNegativeEnd = specifier.Length;
-                    specifierZeroEnd = specifierPositiveEnd;
-                }
-                else {
-                    specifierZeroStart = specifierNegativeEnd + 1;
-                    specifierZeroEnd = specifier.Length;
-                }
-            }
-            // Special: Handle zero
-            if (IsZero(ref number)) {
-                FormatCustomFormatString(formatter, ref number, null, specifier, specifierZeroStart, specifierZeroEnd, culture);
-                return;
-            }
-            // Iteration 2: Divide and round number
-            int originalScale = number.Scale;
-            if (number.Sign == 0) ApplyDivisionAndPrecision(ref number, specifier, 0, specifierPositiveEnd);
-            else ApplyDivisionAndPrecision(ref number, specifier, specifierNegativeStart, specifierNegativeEnd);
-            // Iteration 3: Count; Iteration 4: Format
-            if (IsZero(ref number)) FormatCustomFormatString(formatter, ref number, null, specifier, specifierZeroStart, specifierZeroEnd, culture);
-            else if (number.Sign == 0) FormatCustomFormatString(formatter, ref number, originalScale, specifier, 0, specifierPositiveEnd, culture);
-            else {
-                if (specifierNegativeStart == 0) formatter.Append(culture.NegativeSign);
-                FormatCustomFormatString(formatter, ref number, originalScale, specifier, specifierNegativeStart, specifierNegativeEnd, culture);
-            }
-        }
-        static int IndexOfSectionSeparator(StringView specifier) {
+		static void NumberToCustomFormatString(StringBuffer formatter, ref Number number, StringView specifier, CachedCulture culture) {
+			// Special: Handle special values
+			switch (number.Scale) {
+				case ScaleInf: formatter.Append(number.Sign == 0 ? culture.PositiveInfinity : culture.NegativeInfinity); return;
+				case ScaleNaN: formatter.Append(culture.NaN); return;
+			}
+			// Iteration 1: Split by semicolon
+			int specifierPositiveEnd = IndexOfSectionSeparator(specifier);
+			int specifierNegativeStart = 0, specifierNegativeEnd, specifierZeroStart = 0, specifierZeroEnd;
+			if (specifierPositiveEnd == -1) {
+				specifierPositiveEnd = specifierNegativeEnd = specifierZeroEnd = specifier.Length;
+			}
+			else {
+				specifierNegativeStart = specifierPositiveEnd + 1;
+				specifierNegativeEnd = IndexOfSectionSeparator(specifier, specifierNegativeStart);
+				if (specifierNegativeEnd == -1) {
+					specifierNegativeEnd = specifier.Length;
+					specifierZeroEnd = specifierPositiveEnd;
+				}
+				else {
+					specifierZeroStart = specifierNegativeEnd + 1;
+					specifierZeroEnd = specifier.Length;
+				}
+			}
+			// Special: Handle zero
+			if (IsZero(ref number)) {
+				FormatCustomFormatString(formatter, ref number, null, specifier, specifierZeroStart, specifierZeroEnd, culture);
+				return;
+			}
+			// Iteration 2: Divide and round number
+			int originalScale = number.Scale;
+			if (number.Sign == 0) ApplyDivisionAndPrecision(ref number, specifier, 0, specifierPositiveEnd);
+			else ApplyDivisionAndPrecision(ref number, specifier, specifierNegativeStart, specifierNegativeEnd);
+			// Iteration 3: Count; Iteration 4: Format
+			if (IsZero(ref number)) FormatCustomFormatString(formatter, ref number, null, specifier, specifierZeroStart, specifierZeroEnd, culture);
+			else if (number.Sign == 0) FormatCustomFormatString(formatter, ref number, originalScale, specifier, 0, specifierPositiveEnd, culture);
+			else {
+				if (specifierNegativeStart == 0) formatter.Append(culture.NegativeSign);
+				FormatCustomFormatString(formatter, ref number, originalScale, specifier, specifierNegativeStart, specifierNegativeEnd, culture);
+			}
+		}
+		static int IndexOfSectionSeparator(StringView specifier) {
 			return IndexOfSectionSeparator(specifier, 0);
 		}
 		static int IndexOfSectionSeparator(StringView specifier, int index) {
