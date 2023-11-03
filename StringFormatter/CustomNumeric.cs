@@ -186,7 +186,7 @@ namespace System.Text.Formatting {
 				remainingDigitsInGroup -= groupSize;
 				groupIndex++;
 			}
-			bool appendingDigitFlag = false;
+			bool appendingDigitFlag = false, outOfPrecisionFlag = false;
 			decimalFlag = false;
 			for (index = start; index < end; index++) {
 				switch (ptr[index]) {
@@ -204,13 +204,20 @@ namespace System.Text.Formatting {
 					case '#':
 						if (!appendingDigitFlag) {
 							if (number.Scale > integralDigits) while (currentDigitIndex < number.Scale - integralDigits)
-								formatter.AppendIntegralDigit(ref number, ref currentDigitIndex, culture, groupFlag, ref groupIndex, ref remainingDigitsInGroup);
+								formatter.AppendIntegralDigit(ref number, ref currentDigitIndex, culture, groupFlag, ref outOfPrecisionFlag, ref groupIndex, ref remainingDigitsInGroup);
 							appendingDigitFlag = true;
 						}
 						if (decimalFlag) {
-							if (currentDigitIndex < number.Precision) {
-								char digit = number.Digits[currentDigitIndex++];
-								if (digit == '\0') digit = '0';
+							char digit = '0';
+							if (!outOfPrecisionFlag) {
+								if (currentDigitIndex >= number.Precision) outOfPrecisionFlag = true;
+								else {
+									digit = number.Digits[currentDigitIndex++];
+									if (digit == '\0') {
+										outOfPrecisionFlag = true;
+										digit = '0';
+									}
+								}
 								formatter.Append(digit);
 							}
 							else if (decimalZeros > 0)
@@ -220,7 +227,7 @@ namespace System.Text.Formatting {
 						}
 						else {
 							if (integralDigits <= number.Scale)
-								formatter.AppendIntegralDigit(ref number, ref currentDigitIndex, culture, groupFlag, ref groupIndex, ref remainingDigitsInGroup);
+								formatter.AppendIntegralDigit(ref number, ref currentDigitIndex, culture, groupFlag, ref outOfPrecisionFlag, ref groupIndex, ref remainingDigitsInGroup);
 							else if (integralDigits <= integralZeros)
 								formatter.AppendIntegralDigit('0', culture, groupFlag, ref groupIndex, ref remainingDigitsInGroup);
 							--integralDigits;
@@ -270,11 +277,18 @@ namespace System.Text.Formatting {
 				}
 			}
 		}
-		static void AppendIntegralDigit(this StringBuffer self, ref Number number, ref int index, CachedCulture culture, bool groupFlag, ref int groupIndex, ref int remainingDigitsInGroup) {
-			char digit;
-			if (index >= number.Precision) digit = '0';
-			else digit = number.Digits[index];
-			if (digit == '\0') digit = '0';
+		static void AppendIntegralDigit(this StringBuffer self, ref Number number, ref int index, CachedCulture culture, bool groupFlag, ref bool outOfPrecisionFlag, ref int groupIndex, ref int remainingDigitsInGroup) {
+			char digit = '0';
+			if (!outOfPrecisionFlag) {
+				if (index >= number.Precision) outOfPrecisionFlag = true;
+				else {
+					digit = number.Digits[index];
+					if (digit == '\0') {
+						outOfPrecisionFlag = true;
+						digit = '0';
+					}
+				}
+			}
 			self.AppendIntegralDigit(digit, culture, groupFlag, ref groupIndex, ref remainingDigitsInGroup);
 			index++;
 		}
