@@ -1,4 +1,4 @@
-﻿namespace System.Text.Formatting {
+namespace System.Text.Formatting {
 	// this file contains the custom numeric formatting routines split out from the Numeric.cs file
 	unsafe partial class Numeric {
 		static void NumberToCustomFormatString(StringBuffer formatter, ref Number number, StringView specifier, CachedCulture culture) {
@@ -186,8 +186,7 @@
 				remainingDigitsInGroup -= groupSize;
 				groupIndex++;
 			}
-			if (number.Scale > integralDigits) while (currentDigitIndex < number.Scale - integralDigits)
-				formatter.AppendIntegralDigit(ref number, ref currentDigitIndex, culture, groupFlag, ref groupIndex, ref remainingDigitsInGroup);
+			bool appendingDigitFlag = false;
 			decimalFlag = false;
 			for (index = start; index < end; index++) {
 				switch (ptr[index]) {
@@ -203,6 +202,11 @@
 						break;
 					case '0':
 					case '#':
+						if (!appendingDigitFlag) {
+							if (number.Scale > integralDigits) while (currentDigitIndex < number.Scale - integralDigits)
+								formatter.AppendIntegralDigit(ref number, ref currentDigitIndex, culture, groupFlag, ref groupIndex, ref remainingDigitsInGroup);
+							appendingDigitFlag = true;
+						}
 						if (decimalFlag) {
 							if (currentDigitIndex < number.Precision) {
 								char digit = number.Digits[currentDigitIndex++];
